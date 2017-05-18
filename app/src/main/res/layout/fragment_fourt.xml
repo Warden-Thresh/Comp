@@ -1,13 +1,103 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:leon="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.warden.myapplication.FourtFragment">
+    android:orientation="vertical"
+    tools:context="com.warden.myapplication.FourthFragment">
+<android.support.v4.widget.NestedScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="fourth" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_marginBottom="16dp"
+            android:background="#fff"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/headimage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/user_avatar" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="登录/注册"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <com.leon.lib.settingview.LSettingItem
+            android:id="@+id/item_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            leon:leftIcon="@drawable/message"
+            leon:leftText="我的消息" />
+
+        <com.leon.lib.settingview.LSettingItem
+            android:id="@+id/item_order"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            leon:leftIcon="@drawable/order"
+            leon:leftText="订单" />
+
+        <com.leon.lib.settingview.LSettingItem
+            android:id="@+id/item_history_user_information"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:theme="@style/MyCheckBox"
+            leon:leftIcon="@drawable/user_information"
+            leon:leftText="常用乘客信息" />
+
+        <com.leon.lib.settingview.LSettingItem
+            android:id="@+id/item_ticket"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            leon:leftIcon="@drawable/ticket"
+            leon:leftText="电子车票" />
+
+        <com.leon.lib.settingview.LSettingItem
+            android:id="@+id/item_collocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            leon:leftIcon="@drawable/collocation"
+            leon:leftText="收藏" />
+
+        <com.leon.lib.settingview.LSettingItem
+            android:id="@+id/item_feedback"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            leon:leftIcon="@drawable/feedback"
+            leon:leftText="意见反馈" />
+
+        <com.leon.lib.settingview.LSettingItem
+            android:id="@+id/item_setting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            leon:leftIcon="@drawable/setting"
+            leon:leftText="设置" />
+
+        <com.leon.lib.settingview.LSettingItem
+            android:id="@+id/item_about"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            leon:leftIcon="@drawable/about"
+            leon:leftText="关于" />
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>
+
 
 </FrameLayout>

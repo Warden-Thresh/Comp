@@ -15,6 +15,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,6 +56,7 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class FirstFragment extends Fragment {
+    public DrawerLayout drawerLayout;
     MyLocationListener myListener = new MyLocationListener();
     LocationClient mLocationClient;
     private OnFragmentInteractionListener mListener;
@@ -88,6 +90,7 @@ public class FirstFragment extends Fragment {
     // TODO: Rename and change types and number of parameters
     public static FirstFragment newInstance(String param1, String param2) {
 
+
         FirstFragment fragment = new FirstFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
@@ -113,6 +116,7 @@ public class FirstFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_first, container, false);
         mapView = (MapView) view.findViewById(R.id.bmapView);
         positionText =(TextView)view.findViewById(R.id.position_text_view) ;
+        drawerLayout = (DrawerLayout) view.findViewById(R.id.drawer_layout);
         baiduMap = mapView.getMap();
         baiduMap.setMyLocationEnabled(true);
 
