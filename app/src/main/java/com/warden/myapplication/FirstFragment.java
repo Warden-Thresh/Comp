@@ -131,7 +131,7 @@ public class FirstFragment extends Fragment {
                 // uiSettings.setCompassEnabled(false); // 是否显示指南针
                 // 设置指南针的位置，在 onMapLoadFinish 后生效
                 uiSettings.setCompassEnabled(true);
-                uiSettings.setOverlookingGesturesEnabled(false); //设置是否允许俯视手势
+                uiSettings.setOverlookingGesturesEnabled(true); //设置是否允许俯视手势
                 // uiSettings.setRotateGesturesEnabled(false); //设置是否允许旋转手势
                 // uiSettings.setScrollGesturesEnabled(false); //设置是否允许拖拽手势
                 // uiSettings.setZoomGesturesEnabled(false); //设置是否允许缩放手势
@@ -227,7 +227,7 @@ public class FirstFragment extends Fragment {
             Log.d("Location:",":Longitude:"+location.getLongitude());
             MapStatusUpdate update = MapStatusUpdateFactory.newLatLngZoom(ll,18f);
             baiduMap.animateMapStatus(update);
-            isFirstLocate = false;
+
 
         }
         MyLocationData.Builder locationBuilder = new MyLocationData.Builder();

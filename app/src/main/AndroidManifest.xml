@@ -32,9 +32,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activity.FruitActivity"
+            android:name=".Activity.DetailActivity"
             android:theme="@style/FruitActivityTheme" />
-        <activity android:name=".Activity.MessageActivity" />
+        <activity android:name=".Activity.ListActivity" />
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"

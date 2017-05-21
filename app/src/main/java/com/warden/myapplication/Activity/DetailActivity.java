@@ -14,17 +14,17 @@ import com.bumptech.glide.Glide;
 import com.warden.myapplication.R;
 
 
-public class FruitActivity extends AppCompatActivity {
-    public static final String FRUIT_NAME = "fruit_name";
-    public static final String FRUIT_IMAGE_ID = "fruit_image_id";
+public class DetailActivity extends AppCompatActivity {
+    public static final String MESSAGE_TITLE = "message_title";
+    public static final String MESSAGE_CONTEXT = "message_context";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fruit);
         Intent intent = getIntent();
-        String fruitName = intent.getStringExtra(FRUIT_NAME);
-        int fruitImageId = intent.getIntExtra(FRUIT_IMAGE_ID,0);
+        String messageTitle = intent.getStringExtra(MESSAGE_TITLE);
+        String messageContext = intent.getStringExtra(MESSAGE_CONTEXT);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         ImageView fruitImageView = (ImageView) findViewById(R.id.fruit_image_view);
@@ -34,9 +34,9 @@ public class FruitActivity extends AppCompatActivity {
         if (actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        collapsingToolbar.setTitle(fruitName);
-        Glide.with(this).load(fruitImageId).into(fruitImageView);
-        String fruitContent = generateFruitContent(fruitName);
+        collapsingToolbar.setTitle(messageTitle);
+        Glide.with(this).load(R.drawable.test_message).into(fruitImageView);
+        String fruitContent = messageContext;
         fruitContentText.setText(fruitContent);
     }
     private String generateFruitContent(String fruitName){

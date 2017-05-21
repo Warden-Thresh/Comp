@@ -11,8 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.leon.lib.settingview.LSettingItem;
-import com.warden.myapplication.Activity.FruitActivity;
-import com.warden.myapplication.Activity.MessageActivity;
+import com.warden.myapplication.Activity.ListActivity;
 
 
 /**
@@ -75,7 +74,7 @@ public class FourthFragment extends Fragment {
             @Override
             public void click() {
                 Context context = getContext();
-                Intent intent = new Intent(context, MessageActivity.class);
+                Intent intent = new Intent(context, ListActivity.class);
                 context.startActivity(intent);
                 Toast.makeText(getContext().getApplicationContext(), "我的消息", Toast.LENGTH_SHORT).show();
             }
