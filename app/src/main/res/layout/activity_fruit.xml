@@ -19,7 +19,8 @@
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             android:fitsSystemWindows="true"
-            app:statusBarScrim="@android:color/transparent">
+            app:statusBarScrim="@android:color/transparent"
+            >
             <ImageView
                 android:id="@+id/fruit_image_view"
                 android:layout_width="match_parent"
@@ -40,6 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:src="@drawable/ic_comment"
+        android:clickable="true"
         app:layout_anchor="@id/appBar"
         app:layout_anchorGravity="bottom|end"/>
 

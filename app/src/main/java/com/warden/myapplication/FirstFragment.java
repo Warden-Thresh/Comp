@@ -189,7 +189,6 @@ public class FirstFragment extends Fragment implements SensorEventListener {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                isFirstLocate=true;
                 mLocationClient.requestLocation();
                 switch (mCurrentMode) {
                     case NORMAL:

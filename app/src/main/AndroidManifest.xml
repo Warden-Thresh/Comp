@@ -39,7 +39,7 @@
         </activity>
         <activity
             android:name=".Activity.DetailActivity"
-            android:theme="@style/FruitActivityTheme" />
+            android:theme="@style/DetailActivityTheme" />
         <activity android:name=".Activity.ListActivity" />
 
         <service
