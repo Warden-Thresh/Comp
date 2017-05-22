@@ -245,7 +245,7 @@ public class FirstFragment extends Fragment implements SensorEventListener {
         LocationClientOption option = new LocationClientOption();
         option.setOpenGps(true);// 打开gps
         option.setCoorType("bd09ll");
-        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
+       // option.setScanSpan(1000);
         option.setIsNeedAddress(true);
         mLocationClient.setLocOption(option);
     }
@@ -273,18 +273,20 @@ public class FirstFragment extends Fragment implements SensorEventListener {
     }
     private void navigateTo(BDLocation location){
         if (isFirstLocate){
-            LatLng ll = new LatLng(location.getLatitude(),location.getLongitude());
             Log.d("Location:",":Latitude:"+location.getLatitude());
             Log.d("Location:",":Longitude:"+location.getLongitude());
-            MapStatusUpdate update = MapStatusUpdateFactory.newLatLngZoom(ll,18f);
-            mBaiduMap.animateMapStatus(update);
-
+            isFirstLocate = false;
+            LatLng ll = new LatLng(location.getLatitude(),
+                    location.getLongitude());
+            MapStatus.Builder builder = new MapStatus.Builder();
+            builder.target(ll).zoom(18.0f);
+            mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
 
         }
         MyLocationData.Builder locationBuilder = new MyLocationData.Builder();
         locationBuilder
                 .accuracy(location.getRadius())
-                .direction(mCurrentDirection).latitude(location.getLatitude())
+                .latitude(location.getLatitude())
                 .longitude(location.getLongitude());
         locData = locationBuilder.build();
         mBaiduMap.setMyLocationData(locData);
@@ -314,10 +316,16 @@ public class FirstFragment extends Fragment implements SensorEventListener {
     public class MyLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
+            if (bdLocation == null || mMapView == null) {
+                return;
+            }
             Log.d("Location","suss");
             Log.d("Location",bdLocation.getCity()+"Altitude"+bdLocation.getAltitude()+"Longitude"+bdLocation.getLongitude());
             if (bdLocation.getLocType() == BDLocation.TypeGpsLocation
                     || bdLocation.getLocType() == BDLocation.TypeNetWorkLocation){
+                mCurrentLat = bdLocation.getLatitude();
+                mCurrentLon = bdLocation.getLongitude();
+                mCurrentAccracy = bdLocation.getRadius();
                 navigateTo(bdLocation);
                 SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit();
                 editor.putString("currentLongitude", String.valueOf(bdLocation.getLongitude()));
@@ -376,6 +384,8 @@ public class FirstFragment extends Fragment implements SensorEventListener {
     }
     @Override
     public void onDestroy() {
+        // 退出时销毁定位
+        mLocationClient.stop();
         super.onDestroy();
         //在activity执行onDestroy时执行mMapView.onDestroy()，实现地图生命周期管理
         mMapView.onDestroy();
