@@ -13,7 +13,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.warden.myapplication.FirstFragment;
 import com.warden.myapplication.R;
 import com.warden.myapplication.db.City;
 import com.warden.myapplication.db.County;

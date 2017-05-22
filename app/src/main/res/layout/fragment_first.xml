@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.warden.myapplication.FirstFragment">
+    tools:context="com.warden.myapplication.Fragment.FirstFragment">
     <com.arlib.floatingsearchview.FloatingSearchView
         android:id="@+id/floating_search_view"
         android:layout_width="match_parent"
@@ -35,7 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.baidu.mapapi.map.MapView
+        <com.baidu.mapapi.map.TextureMapView
             android:id="@+id/bmapView"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
