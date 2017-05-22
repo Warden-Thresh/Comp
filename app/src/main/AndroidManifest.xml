@@ -19,7 +19,7 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
-        android:name=".MyApplication"
+        android:name=".util.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -30,7 +30,7 @@
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="ElK18R8cOCmuZl0z0AvHFPeeTm4Ux8m6" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".Activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -45,15 +45,27 @@
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"
-            android:process=":remote"></service>
+            android:process=":remote" />
         <service
             android:name=".service.AutoUpdateService"
             android:enabled="true"
             android:exported="true" />
 
         <activity
-            android:name=".LoginActivity"
-            android:label="@string/title_activity_login"></activity>
+            android:name=".Activity.LoginActivity"
+            android:label="@string/title_activity_login" />
+        <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
+        -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
     </application>
 
 </manifest>
