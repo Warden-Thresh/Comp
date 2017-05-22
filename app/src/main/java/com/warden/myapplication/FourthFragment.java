@@ -8,6 +8,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.leon.lib.settingview.LSettingItem;
@@ -22,7 +24,7 @@ import com.warden.myapplication.Activity.ListActivity;
  * Use the {@link FourthFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FourthFragment extends Fragment {
+public class FourthFragment extends Fragment implements View.OnClickListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -69,7 +71,14 @@ public class FourthFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_fourt, container, false);
+        initView(view);
+        return view;
+    }
+    private void initView(View view){
+        ImageView avater = (ImageView) view.findViewById(R.id.avatar) ;
+        Button buttonLogin=(Button) view.findViewById(R.id.login);
         LSettingItem mSettingItemOne = (LSettingItem) view.findViewById(R.id.item_message);
+        LSettingItem mSettingItemTow = (LSettingItem) view.findViewById(R.id.item_about);
         mSettingItemOne.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
             @Override
             public void click() {
@@ -79,8 +88,23 @@ public class FourthFragment extends Fragment {
                 Toast.makeText(getContext().getApplicationContext(), "我的消息", Toast.LENGTH_SHORT).show();
             }
         });
-        return view;
+
+        mSettingItemTow.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
+            @Override
+            public void click() {
+
+            }
+        });
+        buttonLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context context = getContext();
+                Intent intent = new Intent(context, LoginActivity.class);
+                context.startActivity(intent);
+            }
+        });
     }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -106,6 +130,16 @@ public class FourthFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.item_about:
+                break;
+            default:
+                break;
+        }
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -119,5 +153,8 @@ public class FourthFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+    public void login (View v){
+
     }
 }

@@ -1,5 +1,6 @@
 package com.warden.myapplication;
 
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.hardware.SensorManager;
@@ -32,12 +33,13 @@ import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.MyLocationConfiguration.LocationMode;
 import com.baidu.mapapi.model.LatLng;
+import com.warden.myapplication.service.AutoUpdateService;
 
 public class MainActivity extends AppCompatActivity implements FirstFragment.OnFragmentInteractionListener ,
         SecondFragment.OnFragmentInteractionListener,
         ThirdFragment.OnFragmentInteractionListener,
         FourthFragment.OnFragmentInteractionListener {
-    SDKReceiver mReceiver;
+    //SDKReceiver mReceiver;
     private FragmentManager fragmentManager;
     private int currentFragmentId = 0;
     private Fragment currentFragment;
@@ -81,12 +83,15 @@ public class MainActivity extends AppCompatActivity implements FirstFragment.OnF
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         BottomNavigationViewHelper.disableShiftMode(navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        //启动服务
+        Intent intent = new Intent(this, AutoUpdateService.class);
+        startService(intent);
         // 初始化view
         IntentFilter iFilter = new IntentFilter();
         iFilter.addAction(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR);
         iFilter.addAction(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR);
-        mReceiver = new SDKReceiver();
-        registerReceiver(mReceiver, iFilter);
+        //mReceiver = new SDKReceiver();
+        //registerReceiver(mReceiver, iFilter);
         initView(savedInstanceState);
     }
 

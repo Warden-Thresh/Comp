@@ -1,18 +1,18 @@
 package com.warden.myapplication;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapRegionDecoder;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
-import android.net.sip.SipAudioCall;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,18 +31,15 @@ import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
-import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapPoi;
+import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
-import com.baidu.mapapi.map.Marker;
-import com.baidu.mapapi.map.MarkerOptions;
+import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
-import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.UiSettings;
 import com.baidu.mapapi.model.LatLng;
-import com.baidu.mapapi.model.inner.Point;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,15 +53,32 @@ import java.util.List;
  * Use the {@link FirstFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FirstFragment extends Fragment {
+public class FirstFragment extends Fragment implements SensorEventListener {
+    private int mRequestCode;
     public DrawerLayout drawerLayout;
+    private FloatingActionButton fab;
+    //定位
+    private MyLocationConfiguration.LocationMode mCurrentMode;
     MyLocationListener myListener = new MyLocationListener();
     LocationClient mLocationClient;
+    BitmapDescriptor mCurrentMarker;
+    private static final int accuracyCircleFillColor = 0xAAFFFF88;
+    private static final int accuracyCircleStrokeColor = 0xAA00FF00;
+    private SensorManager mSensorManager;
+    private Double lastX = 0.0;
+    private int mCurrentDirection = 0;
+    private double mCurrentLat = 0.0;
+    private double mCurrentLon = 0.0;
+    private float mCurrentAccracy;
+    //UI
+    RadioGroup.OnCheckedChangeListener radioButtonListener;
     private OnFragmentInteractionListener mListener;
     private TextView positionText;
-    private MapView mapView;
-    private BaiduMap baiduMap;
+    private MapView mMapView;
+    private BaiduMap mBaiduMap;
     private boolean isFirstLocate = true;
+    private MyLocationData locData;
+    public boolean querryWeather= false;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -114,20 +129,23 @@ public class FirstFragment extends Fragment {
         // Inflate the layout for this fragment
         SDKInitializer.initialize(getActivity().getApplicationContext());
         View view = inflater.inflate(R.layout.fragment_first, container, false);
-        mapView = (MapView) view.findViewById(R.id.bmapView);
+        mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);//获取传感器管理服务
+        mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
+        mMapView = (MapView) view.findViewById(R.id.bmapView);
         positionText =(TextView)view.findViewById(R.id.position_text_view) ;
         drawerLayout = (DrawerLayout) view.findViewById(R.id.drawer_layout);
-        baiduMap = mapView.getMap();
-        baiduMap.setMyLocationEnabled(true);
-
+        mBaiduMap = mMapView.getMap();
+        // 开启定位图层
+        mBaiduMap.setMyLocationEnabled(true);
+        // 定位初始化
         mLocationClient = new LocationClient(getActivity().getApplicationContext());
         mLocationClient.registerLocationListener(myListener);
-        baiduMap.setOnMapClickListener(listener);
-        baiduMap.setOnMapLoadedCallback(new BaiduMap.OnMapLoadedCallback() {
+        mBaiduMap.setOnMapClickListener(listener);
+        mBaiduMap.setOnMapLoadedCallback(new BaiduMap.OnMapLoadedCallback() {
 
             @Override
             public void onMapLoaded() {
-                UiSettings uiSettings = baiduMap.getUiSettings();
+                UiSettings uiSettings = mBaiduMap.getUiSettings();
                 // uiSettings.setCompassEnabled(false); // 是否显示指南针
                 // 设置指南针的位置，在 onMapLoadFinish 后生效
                 uiSettings.setCompassEnabled(true);
@@ -158,20 +176,49 @@ public class FirstFragment extends Fragment {
         } else {
             requestLocation();
         }
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        String longitude = prefs.getString("currentLongitude",null);
+        String latitude = prefs.getString("currentLatitude",null);
+        if (longitude !=null&latitude !=null){
+            BDLocation location = new BDLocation();
+            location.setLongitude(Double.parseDouble(longitude));
+            location.setLatitude(Double.parseDouble(latitude));
+            navigateTo(location);
+        }
+        fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mLocationClient.requestLocation();
                 isFirstLocate=true;
-               /* Snackbar.make(view, "Data delete", Snackbar.LENGTH_SHORT)
-                        .setAction("Undo", new View.OnClickListener() {
-
-                            @Override
-                            public void onClick(View v) {
-                                Toast.makeText(getActivity(), "Data restored", Toast.LENGTH_SHORT).show();
-                            }
-                        }).show();*/
+                mLocationClient.requestLocation();
+                switch (mCurrentMode) {
+                    case NORMAL:
+                        //requestLocButton.setText("跟随");
+                        mCurrentMode = MyLocationConfiguration.LocationMode.FOLLOWING;
+                        mBaiduMap.setMyLocationConfiguration(new MyLocationConfiguration(
+                                mCurrentMode, true, mCurrentMarker));
+                        MapStatus.Builder builder = new MapStatus.Builder();
+                        builder.overlook(0);
+                        mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+                        break;
+                    case COMPASS:
+                        //requestLocButton.setText("普通");
+                        mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
+                        mBaiduMap.setMyLocationConfiguration(new MyLocationConfiguration(
+                                mCurrentMode, true, mCurrentMarker));
+                        MapStatus.Builder builder1 = new MapStatus.Builder();
+                        builder1.overlook(0);
+                        mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder1.build()));
+                        break;
+                    case FOLLOWING:
+                        //requestLocButton.setText("罗盘");
+                        mCurrentMode = MyLocationConfiguration.LocationMode.COMPASS;
+                        mBaiduMap.setMyLocationConfiguration(new MyLocationConfiguration(
+                                mCurrentMode, true, mCurrentMarker));
+                        break;
+                    default:
+                        break;
+                }
             }
         });
         return view;
@@ -183,14 +230,18 @@ public class FirstFragment extends Fragment {
             mListener.onFragmentInteraction(uri);
         }
     }
-    private void requestLocation() {
+    public void requestLocation() {
         Toast.makeText(getActivity(),"dwe", Toast.LENGTH_SHORT).show();
         initLocation();
-        mLocationClient.start();
+        if (mLocationClient.isStarted()){
+            mLocationClient.requestLocation();
+        }else {
+            mLocationClient.start();
+        }
     }
 
     private void initLocation(){
-        Toast.makeText(getActivity(),"initlocation", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity(),"initlocation", Toast.LENGTH_SHORT).show();
         LocationClientOption option = new LocationClientOption();
         option.setOpenGps(true);// 打开gps
         option.setCoorType("bd09ll");
@@ -226,17 +277,38 @@ public class FirstFragment extends Fragment {
             Log.d("Location:",":Latitude:"+location.getLatitude());
             Log.d("Location:",":Longitude:"+location.getLongitude());
             MapStatusUpdate update = MapStatusUpdateFactory.newLatLngZoom(ll,18f);
-            baiduMap.animateMapStatus(update);
+            mBaiduMap.animateMapStatus(update);
 
 
         }
         MyLocationData.Builder locationBuilder = new MyLocationData.Builder();
         locationBuilder
                 .accuracy(location.getRadius())
-                .direction(180).latitude(location.getLatitude())
+                .direction(mCurrentDirection).latitude(location.getLatitude())
                 .longitude(location.getLongitude());
-        MyLocationData locationData = locationBuilder.build();
-        baiduMap.setMyLocationData(locationData);
+        locData = locationBuilder.build();
+        mBaiduMap.setMyLocationData(locData);
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        double x = sensorEvent.values[SensorManager.DATA_X];
+        if (Math.abs(x - lastX) > 1.0) {
+            mCurrentDirection = (int) x;
+            locData = new MyLocationData.Builder()
+                    .accuracy(mCurrentAccracy)
+                    // 此处设置开发者获取到的方向信息，顺时针0-360
+                    .direction(mCurrentDirection).latitude(mCurrentLat)
+                    .longitude(mCurrentLon).build();
+            mBaiduMap.setMyLocationData(locData);
+        }
+        lastX = x;
+
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 
     public class MyLocationListener implements BDLocationListener {
@@ -247,7 +319,21 @@ public class FirstFragment extends Fragment {
             if (bdLocation.getLocType() == BDLocation.TypeGpsLocation
                     || bdLocation.getLocType() == BDLocation.TypeNetWorkLocation){
                 navigateTo(bdLocation);
+                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit();
+                editor.putString("currentLongitude", String.valueOf(bdLocation.getLongitude()));
+                editor.putString("currentLatitude", String.valueOf(bdLocation.getLatitude()));
+                editor.apply();
+                Log.d("requestCode",String.valueOf(mRequestCode));
+                if (querryWeather){
+                    ThirdFragment fragment = (ThirdFragment) getActivity().getSupportFragmentManager().findFragmentByTag("third");
+                    fragment.requestWeather();
+                    querryWeather=false;
+                }
+            }else {
+                requestLocation();
             }
+
+
         }
 
         @Override
@@ -292,20 +378,31 @@ public class FirstFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         //在activity执行onDestroy时执行mMapView.onDestroy()，实现地图生命周期管理
-        mapView.onDestroy();
+        mMapView.onDestroy();
     }
     @Override
     public void onResume() {
         super.onResume();
         //在activity执行onResume时执行mMapView. onResume ()，实现地图生命周期管理
-        mapView.onResume();
+        mMapView.onResume();
+        //为系统的方向传感器注册监听器
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+                SensorManager.SENSOR_DELAY_UI);
     }
     @Override
     public void onPause() {
         super.onPause();
         //在activity执行onPause时执行mMapView. onPause ()，实现地图生命周期管理
-        mapView.onPause();
+        mMapView.onPause();
     }
+
+    @Override
+    public void onStop() {
+        //取消注册传感器监听
+        mSensorManager.unregisterListener(this);
+        super.onStop();
+    }
+
     BaiduMap.OnMapClickListener listener = new BaiduMap.OnMapClickListener() {
         /**
          * 地图单击事件回调函数
@@ -324,4 +421,5 @@ public class FirstFragment extends Fragment {
             return true;
         }
     };
+
 }
