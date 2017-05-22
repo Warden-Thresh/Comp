@@ -30,7 +30,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:src="@drawable/user_avatar"
-                android:onClick="login"
                 />
 
             <Button

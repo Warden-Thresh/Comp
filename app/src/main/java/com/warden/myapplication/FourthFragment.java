@@ -24,7 +24,7 @@ import com.warden.myapplication.Activity.ListActivity;
  * Use the {@link FourthFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FourthFragment extends Fragment implements View.OnClickListener{
+public class FourthFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -130,15 +130,6 @@ public class FourthFragment extends Fragment implements View.OnClickListener{
         mListener = null;
     }
 
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.item_about:
-                break;
-            default:
-                break;
-        }
-    }
 
     /**
      * This interface must be implemented by activities that contain this
@@ -153,8 +144,5 @@ public class FourthFragment extends Fragment implements View.OnClickListener{
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
-    }
-    public void login (View v){
-
     }
 }
