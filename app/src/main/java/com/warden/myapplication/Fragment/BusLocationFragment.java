@@ -72,10 +72,9 @@ import com.warden.myapplication.R;
 public class BusLocationFragment extends Fragment implements
         OnGetPoiSearchResultListener, OnGetBusLineSearchResultListener,
         BaiduMap.OnMapClickListener {
-    private String mHint;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String HINT = "hint";
+    private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
@@ -88,9 +87,9 @@ public class BusLocationFragment extends Fragment implements
     private Button mBtnPre = null; // 上一个节点
     private Button mBtnNext = null; // 下一个节点
     private Button mBtnSearch = null;
+    private LinearLayout searchLayout;
     private EditText editCity;
     private EditText editSearchKey;
-    private LinearLayout searchLayout;
     private int nodeIndex = -2; // 节点索引,供浏览节点时使用
     private BusLineResult route = null; // 保存驾车/步行路线数据的变量，供浏览节点时使用
     private List<String> busLineIDList = null;
@@ -121,7 +120,7 @@ public class BusLocationFragment extends Fragment implements
     public static BusLocationFragment newInstance(String param1) {
         BusLocationFragment fragment = new BusLocationFragment();
         Bundle args = new Bundle();
-        args.putString(HINT, param1);
+        args.putString(ARG_PARAM1, param1);
         //args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
@@ -131,8 +130,7 @@ public class BusLocationFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(HINT);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mParam1 = getArguments().getString(ARG_PARAM1);
         }
     }
 
@@ -141,8 +139,8 @@ public class BusLocationFragment extends Fragment implements
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_bus_location, container, false);
-        mBtnPre = (Button) view.findViewById(R.id.pre);
-        mBtnNext = (Button) view.findViewById(R.id.next);
+        //mBtnPre = (Button) view.findViewById(R.id.pre);
+        //mBtnNext = (Button) view.findViewById(R.id.next);
         mBtnSearch = (Button)view.findViewById(R.id.search);
         editCity = (EditText) view.findViewById(R.id.city);
         editSearchKey = (EditText) view.findViewById(R.id.searchkey);
@@ -150,8 +148,6 @@ public class BusLocationFragment extends Fragment implements
         if (mParam1.equals("我的订单")){
             searchLayout.setVisibility(View.GONE);
         }
-        mBtnPre.setVisibility(View.INVISIBLE);
-        mBtnNext.setVisibility(View.INVISIBLE);
         mMapView = (TextureMapView) view.findViewById(R.id.bmapView_fragment);
         mBaiduMap = mMapView.getMap();
         // 开启定位图层
@@ -189,8 +185,6 @@ public class BusLocationFragment extends Fragment implements
             public void onClick(View v) {
                 busLineIDList.clear();
                 busLineIndex = 0;
-                mBtnPre.setVisibility(View.INVISIBLE);
-                mBtnNext.setVisibility(View.INVISIBLE);
                 // 发起poi检索，从得到所有poi中找到公交线路类型的poi，再使用该poi的uid进行公交详情搜索
                 mSearch.searchInCity((new PoiCitySearchOption()).city(
                         editCity.getText().toString())
@@ -229,7 +223,6 @@ public class BusLocationFragment extends Fragment implements
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
@@ -336,8 +329,6 @@ public class BusLocationFragment extends Fragment implements
         overlay.addToMap();
         overlay.zoomToSpan();
         busLinePoints = overlay.getBusLinePoints();
-        mBtnPre.setVisibility(View.VISIBLE);
-        mBtnNext.setVisibility(View.VISIBLE);
         Toast.makeText(getContext(), result.getBusLineName(),
                 Toast.LENGTH_SHORT).show();
         OverlayOptions markerOptions;

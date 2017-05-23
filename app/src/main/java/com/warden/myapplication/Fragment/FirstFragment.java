@@ -57,7 +57,9 @@ import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.OnBackPressListener;
 import com.orhanobut.dialogplus.OnCancelListener;
 import com.orhanobut.dialogplus.OnDismissListener;
+import com.orhanobut.dialogplus.OnItemClickListener;
 import com.warden.myapplication.R;
+import com.warden.myapplication.adapter.SimpleAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -510,6 +512,20 @@ private void dialog(){
          * @param poi 点击的 poi 信息
          */
         public boolean onMapPoiClick(MapPoi poi){
+            SimpleAdapter adapter = new SimpleAdapter(getContext(),false);
+            DialogPlus dialog = DialogPlus.newDialog(getContext())
+                    .setAdapter(adapter)
+                    .setExpanded(true)
+                    .setHeader(R.layout.header)
+                    .setOnItemClickListener(new OnItemClickListener() {
+                        @Override
+                        public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                        }
+                    })
+                    .create();
+            dialog.show();
+            TextView textTitle = (TextView) dialog.getHeaderView().findViewById(R.id.text_title);
+            textTitle.setText(poi.getName());
             mSearch.reverseGeoCode(new ReverseGeoCodeOption()
                     .location(poi.getPosition()));
             Toast.makeText(getActivity(), "Poi"+poi.getName(), Toast.LENGTH_SHORT).show();
