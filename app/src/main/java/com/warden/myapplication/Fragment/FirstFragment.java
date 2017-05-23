@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,15 +32,25 @@ import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.TextureMapView;
 import com.baidu.mapapi.map.UiSettings;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.search.core.SearchResult;
+import com.baidu.mapapi.search.geocode.GeoCodeOption;
+import com.baidu.mapapi.search.geocode.GeoCodeResult;
+import com.baidu.mapapi.search.geocode.GeoCoder;
+import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
+import com.baidu.platform.comapi.map.F;
 import com.warden.myapplication.R;
 
 import java.util.ArrayList;
@@ -54,7 +65,7 @@ import java.util.List;
  * Use the {@link FirstFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FirstFragment extends Fragment implements SensorEventListener {
+public class FirstFragment extends Fragment implements SensorEventListener,OnGetGeoCoderResultListener {
     private int mRequestCode;
     public DrawerLayout drawerLayout;
     private FloatingActionButton fab;
@@ -80,6 +91,8 @@ public class FirstFragment extends Fragment implements SensorEventListener {
     private boolean isFirstLocate = true;
     private MyLocationData locData;
     public boolean querryWeather= false;
+    //GEO
+    GeoCoder mSearch = null; // 搜索模块
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -122,6 +135,8 @@ public class FirstFragment extends Fragment implements SensorEventListener {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        mSearch = GeoCoder.newInstance();
+        mSearch.setOnGetGeoCodeResultListener(this);
     }
 
     @Override
@@ -140,7 +155,8 @@ public class FirstFragment extends Fragment implements SensorEventListener {
         // 定位初始化
         mLocationClient = new LocationClient(getActivity().getApplicationContext());
         mLocationClient.registerLocationListener(myListener);
-        mBaiduMap.setOnMapClickListener(listener);
+        mBaiduMap.setOnMapClickListener(onMapClickListener);
+        mBaiduMap.setOnMapLongClickListener(onMapLongClickListener);
         mBaiduMap.setOnMapLoadedCallback(new BaiduMap.OnMapLoadedCallback() {
 
             @Override
@@ -246,7 +262,7 @@ public class FirstFragment extends Fragment implements SensorEventListener {
         LocationClientOption option = new LocationClientOption();
         option.setOpenGps(true);// 打开gps
         option.setCoorType("bd09ll");
-       // option.setScanSpan(1000);
+        option.setScanSpan(1000);
         option.setIsNeedAddress(true);
         mLocationClient.setLocOption(option);
     }
@@ -278,7 +294,7 @@ public class FirstFragment extends Fragment implements SensorEventListener {
                 location.getLongitude());
         MapStatus.Builder builder = new MapStatus.Builder();
         builder.target(ll).zoom(18.0f);
-        mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+        mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()),1000);
         MyLocationData.Builder locationBuilder = new MyLocationData.Builder();
         locationBuilder
                 .accuracy(location.getRadius())
@@ -286,6 +302,7 @@ public class FirstFragment extends Fragment implements SensorEventListener {
                 .longitude(location.getLongitude());
         locData = locationBuilder.build();
         mBaiduMap.setMyLocationData(locData);
+        isFirstLocate= false;
     }
 
     @Override
@@ -309,6 +326,30 @@ public class FirstFragment extends Fragment implements SensorEventListener {
 
     }
 
+    @Override
+    public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
+
+    }
+
+    @Override
+    public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
+        if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
+            Toast.makeText(getActivity(), "抱歉，未能找到结果", Toast.LENGTH_LONG)
+                    .show();
+            return;
+        }
+        ReverseGeoCodeResult.AddressComponent addressDetail = result.getAddressDetail();
+        mBaiduMap.clear();
+        mBaiduMap.addOverlay(new MarkerOptions().position(result.getLocation())
+                .icon(BitmapDescriptorFactory
+                        .fromResource(R.drawable.icon_marka)));
+        mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLngZoom(result
+                .getLocation(),18f), 600);
+        Toast.makeText(getActivity(), result.getSematicDescription(),
+                Toast.LENGTH_LONG).show();
+
+    }
+
     public class MyLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
@@ -325,7 +366,6 @@ public class FirstFragment extends Fragment implements SensorEventListener {
                 Log.d("Location","suss");
                 if (isFirstLocate){
                     navigateTo(bdLocation);
-                    isFirstLocate = false;
                 }
                 SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit();
                 editor.putString("currentLongitude", String.valueOf(bdLocation.getLongitude()));
@@ -344,7 +384,6 @@ public class FirstFragment extends Fragment implements SensorEventListener {
         public void onConnectHotSpotMessage(String s, int i) {
 
         }
-
     }
 
     @Override
@@ -413,22 +452,44 @@ public class FirstFragment extends Fragment implements SensorEventListener {
         super.onStop();
     }
 
-    BaiduMap.OnMapClickListener listener = new BaiduMap.OnMapClickListener() {
+    BaiduMap.OnMapClickListener onMapClickListener = new BaiduMap.OnMapClickListener() {
         /**
          * 地图单击事件回调函数
          * @param point 点击的地理坐标
          */
         public void onMapClick(LatLng point){
-            Toast.makeText(getActivity(), "Map", Toast.LENGTH_SHORT).show();
+            mBaiduMap.clear();
         }
         /**
          * 地图内 Poi 单击事件回调函数
          * @param poi 点击的 poi 信息
          */
         public boolean onMapPoiClick(MapPoi poi){
-            Toast.makeText(getActivity(), "HotSpot", Toast.LENGTH_SHORT).show();
-
+            mSearch.reverseGeoCode(new ReverseGeoCodeOption()
+                    .location(poi.getPosition()));
+            Toast.makeText(getActivity(), "Poi"+poi.getName(), Toast.LENGTH_SHORT).show();
             return true;
+        }
+    };
+    /**
+     * 发起搜索
+     *
+     * @param point
+     */
+    public void reverseGeoCode(LatLng point) {
+        // 反Geo搜索
+        mSearch.reverseGeoCode(new ReverseGeoCodeOption()
+                .location(point));
+
+    }
+
+    BaiduMap.OnMapLongClickListener onMapLongClickListener = new BaiduMap.OnMapLongClickListener() {
+        /**
+         * 地图长按事件监听回调函数
+         * @param point 长按的地理坐标
+         */
+        public void onMapLongClick(LatLng point){
+            reverseGeoCode(point);
         }
     };
 
