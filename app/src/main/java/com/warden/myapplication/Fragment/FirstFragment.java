@@ -183,6 +183,8 @@ public class FirstFragment extends Fragment implements SensorEventListener {
             BDLocation location = new BDLocation();
             location.setLongitude(Double.parseDouble(longitude));
             location.setLatitude(Double.parseDouble(latitude));
+            Log.d("Location:",":Latitude:"+location.getLatitude());
+            Log.d("Location:",":Longitude:"+location.getLongitude());
             navigateTo(location);
         }
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
@@ -271,8 +273,7 @@ public class FirstFragment extends Fragment implements SensorEventListener {
         }
     }
     private void navigateTo(BDLocation location){
-        Log.d("Location:",":Latitude:"+location.getLatitude());
-        Log.d("Location:",":Longitude:"+location.getLongitude());
+
         LatLng ll = new LatLng(location.getLatitude(),
                 location.getLongitude());
         MapStatus.Builder builder = new MapStatus.Builder();
@@ -314,14 +315,14 @@ public class FirstFragment extends Fragment implements SensorEventListener {
             if (bdLocation == null || mMapView == null) {
                 return;
             }
-            Log.d("Location","suss");
+
             Log.d("Location",bdLocation.getCity()+"Altitude"+bdLocation.getAltitude()+"Longitude"+bdLocation.getLongitude());
             if (bdLocation.getLocType() == BDLocation.TypeGpsLocation
                     || bdLocation.getLocType() == BDLocation.TypeNetWorkLocation){
                 mCurrentLat = bdLocation.getLatitude();
                 mCurrentLon = bdLocation.getLongitude();
                 mCurrentAccracy = bdLocation.getRadius();
-
+                Log.d("Location","suss");
                 if (isFirstLocate){
                     navigateTo(bdLocation);
                     isFirstLocate = false;
@@ -336,11 +337,7 @@ public class FirstFragment extends Fragment implements SensorEventListener {
                     fragment.requestWeather();
                     querryWeather=false;
                 }
-            }else {
-                requestLocation();
             }
-
-
         }
 
         @Override

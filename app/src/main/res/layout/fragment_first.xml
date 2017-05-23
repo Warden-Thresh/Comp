@@ -4,20 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.warden.myapplication.Fragment.FirstFragment">
-    <com.arlib.floatingsearchview.FloatingSearchView
-        android:id="@+id/floating_search_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
 
-        app:floatingSearch_showMenuAction="true"
-        app:floatingSearch_searchHint="Search..."
-        app:floatingSearch_voiceRecHint="Say something..."
-        app:floatingSearch_showSearchHintWhenNotFocused="true"
-        app:floatingSearch_showVoiceInput="true"
-        app:floatingSearch_showOverFlowMenu="true"
-        app:floatingSearch_hideOverflowMenuWhenFocused="true"
-        app:floatingSearch_showSearchKey="false"
-        app:floatingSearch_dismissOnOutsideTouch="true" />
+    <com.baidu.mapapi.map.TextureMapView
+        android:id="@+id/bmapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -29,25 +20,6 @@
         app:backgroundTint="#6c6c6c"
         app:fabSize="mini"
         app:rippleColor="#f7f7f7" />
-
-    <android.support.v4.widget.DrawerLayout
-        android:id="@+id/drawer_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <com.baidu.mapapi.map.TextureMapView
-            android:id="@+id/bmapView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-        <fragment
-            android:id="@+id/choose_area_fragment"
-            android:name="com.warden.myapplication.Fragment.ChooseAreaFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            />
-
-    </android.support.v4.widget.DrawerLayout>
 
 
 </FrameLayout>
