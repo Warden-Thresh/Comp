@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.baidu.mapapi.SDKInitializer;
+import com.warden.myapplication.Fragment.BusFragment;
 import com.warden.myapplication.Fragment.BusLocationFragment;
 import com.warden.myapplication.helper.BottomNavigationViewHelper;
 import com.warden.myapplication.Fragment.FirstFragment;
@@ -29,7 +30,7 @@ import com.warden.myapplication.service.AutoUpdateService;
 public class MainActivity extends AppCompatActivity implements FirstFragment.OnFragmentInteractionListener ,
         SecondFragment.OnFragmentInteractionListener,
         ThirdFragment.OnFragmentInteractionListener,
-        FourthFragment.OnFragmentInteractionListener,BusLocationFragment.OnFragmentInteractionListener {
+        FourthFragment.OnFragmentInteractionListener,BusLocationFragment.OnFragmentInteractionListener,BusFragment.OnFragmentInteractionListener {
     //SDKReceiver mReceiver;
     private FragmentManager fragmentManager;
     private int currentFragmentId = 0;

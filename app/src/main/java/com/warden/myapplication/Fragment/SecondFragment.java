@@ -17,6 +17,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -221,8 +222,8 @@ public class SecondFragment extends Fragment {
     }
     private void setupViewPager(ViewPager viewPager) {
         Adapter adapter = new Adapter(getActivity().getSupportFragmentManager());
-        adapter.addFragment(new BusLocationFragment(), "我的订单");
-        adapter.addFragment(new BusLocationFragment(), "附近公交");
+        adapter.addFragment(BusLocationFragment.newInstance("我的订单"), "我的订单");
+        adapter.addFragment(BusLocationFragment.newInstance("附近公交"), "附近公交");
         //adapter.addFragment(new CheeseListFragment(), "Category 3");
         viewPager.setAdapter(adapter);
     }

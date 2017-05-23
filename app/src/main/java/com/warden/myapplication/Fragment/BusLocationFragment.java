@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -70,9 +72,10 @@ import com.warden.myapplication.R;
 public class BusLocationFragment extends Fragment implements
         OnGetPoiSearchResultListener, OnGetBusLineSearchResultListener,
         BaiduMap.OnMapClickListener {
+    private String mHint;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
+    private static final String HINT = "hint";
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
@@ -87,6 +90,7 @@ public class BusLocationFragment extends Fragment implements
     private Button mBtnSearch = null;
     private EditText editCity;
     private EditText editSearchKey;
+    private LinearLayout searchLayout;
     private int nodeIndex = -2; // 节点索引,供浏览节点时使用
     private BusLineResult route = null; // 保存驾车/步行路线数据的变量，供浏览节点时使用
     private List<String> busLineIDList = null;
@@ -111,15 +115,14 @@ public class BusLocationFragment extends Fragment implements
      * this fragment using the provided parameters.
      *
      * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment BusLocationFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static BusLocationFragment newInstance(String param1, String param2) {
+    public static BusLocationFragment newInstance(String param1) {
         BusLocationFragment fragment = new BusLocationFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(HINT, param1);
+        //args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -128,7 +131,7 @@ public class BusLocationFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam1 = getArguments().getString(HINT);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
@@ -143,6 +146,10 @@ public class BusLocationFragment extends Fragment implements
         mBtnSearch = (Button)view.findViewById(R.id.search);
         editCity = (EditText) view.findViewById(R.id.city);
         editSearchKey = (EditText) view.findViewById(R.id.searchkey);
+        searchLayout = (LinearLayout) view.findViewById(R.id.search_layout);
+        if (mParam1.equals("我的订单")){
+            searchLayout.setVisibility(View.GONE);
+        }
         mBtnPre.setVisibility(View.INVISIBLE);
         mBtnNext.setVisibility(View.INVISIBLE);
         mMapView = (TextureMapView) view.findViewById(R.id.bmapView_fragment);
