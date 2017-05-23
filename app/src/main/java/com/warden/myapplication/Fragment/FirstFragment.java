@@ -20,6 +20,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -51,6 +53,10 @@ import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.baidu.platform.comapi.map.F;
+import com.orhanobut.dialogplus.DialogPlus;
+import com.orhanobut.dialogplus.OnBackPressListener;
+import com.orhanobut.dialogplus.OnCancelListener;
+import com.orhanobut.dialogplus.OnDismissListener;
 import com.warden.myapplication.R;
 
 import java.util.ArrayList;
@@ -81,6 +87,7 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
     private int mCurrentDirection = 0;
     private double mCurrentLat = 0.0;
     private double mCurrentLon = 0.0;
+    private BDLocation mCurrentLocation;
     private float mCurrentAccracy;
     //UI
     RadioGroup.OnCheckedChangeListener radioButtonListener;
@@ -93,6 +100,12 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
     public boolean querryWeather= false;
     //GEO
     GeoCoder mSearch = null; // 搜索模块
+
+    //dialog
+    private RadioGroup radioGroup;
+    private CheckBox headerCheckBox;
+    private CheckBox footerCheckBox;
+    private CheckBox expandedCheckBox;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -146,6 +159,7 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
         View view = inflater.inflate(R.layout.fragment_first, container, false);
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);//获取传感器管理服务
         mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
+        mCurrentLocation = new BDLocation();
         mMapView = (TextureMapView) view.findViewById(R.id.bmapView);
         //positionText =(TextView)view.findViewById(R.id.position_text_view) ;
         drawerLayout = (DrawerLayout) view.findViewById(R.id.drawer_layout);
@@ -196,18 +210,17 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
         String longitude = prefs.getString("currentLongitude",null);
         String latitude = prefs.getString("currentLatitude",null);
         if (longitude !=null&latitude !=null){
-            BDLocation location = new BDLocation();
-            location.setLongitude(Double.parseDouble(longitude));
-            location.setLatitude(Double.parseDouble(latitude));
-            Log.d("Location:",":Latitude:"+location.getLatitude());
-            Log.d("Location:",":Longitude:"+location.getLongitude());
-            navigateTo(location);
+            mCurrentLocation.setLongitude(Double.parseDouble(longitude));
+            mCurrentLocation.setLatitude(Double.parseDouble(latitude));
+            Log.d("LastLocation:",":Latitude:"+mCurrentLocation.getLatitude());
+            Log.d("LastLocation:",":Longitude:"+mCurrentLocation.getLongitude());
+            navigateTo(mCurrentLocation);
         }
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mLocationClient.requestLocation();
+                navigateTo(mCurrentLocation);
                 switch (mCurrentMode) {
                     case NORMAL:
                         //requestLocButton.setText("跟随");
@@ -238,9 +251,35 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
                 }
             }
         });
+        dialog();
         return view;
     }
+private void dialog(){
+    DialogPlus dialogPlus = DialogPlus.newDialog(getContext())
+            .setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, new String[]{"asdfa"}))
+            .setCancelable(true)
+            .setOnDismissListener(new OnDismissListener() {
+                @Override
+                public void onDismiss(DialogPlus dialog) {
 
+                }
+            })
+            .setOnCancelListener(new OnCancelListener() {
+                @Override
+                public void onCancel(DialogPlus dialog) {
+
+                }
+            })
+            .setOnBackPressListener(new OnBackPressListener() {
+                @Override
+                public void onBackPressed(DialogPlus dialogPlus) {
+
+                }
+            })
+            .create();
+
+    dialogPlus.show();
+}
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -262,7 +301,7 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
         LocationClientOption option = new LocationClientOption();
         option.setOpenGps(true);// 打开gps
         option.setCoorType("bd09ll");
-        option.setScanSpan(1000);
+        option.setScanSpan(2000);
         option.setIsNeedAddress(true);
         mLocationClient.setLocOption(option);
     }
@@ -302,7 +341,6 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
                 .longitude(location.getLongitude());
         locData = locationBuilder.build();
         mBaiduMap.setMyLocationData(locData);
-        isFirstLocate= false;
     }
 
     @Override
@@ -352,32 +390,35 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
 
     public class MyLocationListener implements BDLocationListener {
         @Override
-        public void onReceiveLocation(BDLocation bdLocation) {
-            if (bdLocation == null || mMapView == null) {
+        public void onReceiveLocation(BDLocation location) {
+            if (location == null || mMapView == null) {
                 return;
             }
+            mCurrentLat = location.getLatitude();
+            mCurrentLon = location.getLongitude();
+            mCurrentAccracy = location.getRadius();
+            locData = new MyLocationData.Builder()
+                    .accuracy(location.getRadius())
+                    // 此处设置开发者获取到的方向信息，顺时针0-360
+                    .direction(mCurrentDirection).latitude(location.getLatitude())
+                    .longitude(location.getLongitude()).build();
+            mBaiduMap.setMyLocationData(locData);
+            if (isFirstLocate) {
+                isFirstLocate = false;
+                LatLng ll = new LatLng(location.getLatitude(),
+                        location.getLongitude());
+                MapStatus.Builder builder = new MapStatus.Builder();
+                builder.target(ll).zoom(18.0f);
+                mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+            }
 
-            Log.d("Location",bdLocation.getCity()+"Altitude"+bdLocation.getAltitude()+"Longitude"+bdLocation.getLongitude());
-            if (bdLocation.getLocType() == BDLocation.TypeGpsLocation
-                    || bdLocation.getLocType() == BDLocation.TypeNetWorkLocation){
-                mCurrentLat = bdLocation.getLatitude();
-                mCurrentLon = bdLocation.getLongitude();
-                mCurrentAccracy = bdLocation.getRadius();
-                Log.d("Location","suss");
-                if (isFirstLocate){
-                    navigateTo(bdLocation);
-                }
-                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit();
-                editor.putString("currentLongitude", String.valueOf(bdLocation.getLongitude()));
-                editor.putString("currentLatitude", String.valueOf(bdLocation.getLatitude()));
-                editor.apply();
                 Log.d("requestCode",String.valueOf(mRequestCode));
                 if (querryWeather){
                     ThirdFragment fragment = (ThirdFragment) getActivity().getSupportFragmentManager().findFragmentByTag("third");
                     fragment.requestWeather();
                     querryWeather=false;
                 }
-            }
+
         }
 
         @Override
@@ -419,6 +460,10 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
     }
     @Override
     public void onDestroy() {
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit();
+        editor.putString("currentLongitude", String.valueOf(mCurrentLon));
+        editor.putString("currentLatitude", String.valueOf(mCurrentLat));
+        editor.apply();
         // 退出时销毁定位
         mLocationClient.stop();
         super.onDestroy();
