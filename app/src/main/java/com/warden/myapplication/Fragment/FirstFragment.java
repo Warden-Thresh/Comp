@@ -55,7 +55,7 @@ import com.orhanobut.dialogplus.OnItemClickListener;
 import com.warden.myapplication.Activity.RoutePlanActivity;
 import com.warden.myapplication.R;
 import com.warden.myapplication.adapter.SimpleAdapter;
-import com.warden.myapplication.util.MyApplication;
+import com.warden.myapplication.util.Data;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +87,7 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
     private double mCurrentLon = 0.0;
     private double choosedLat;
     private double choosedLon;
+    private String chooseName;
     private BDLocation mLastLocation;
     private float mCurrentAccracy;
     //UI
@@ -277,6 +278,7 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
                         Intent intent = new Intent(context, RoutePlanActivity.class);
                         intent.putExtra("aimLat",choosedLat);
                         intent.putExtra("aimLon",choosedLon);
+                        intent.putExtra("aimName",chooseName);
                         context.startActivity(intent);
                         break;
                     case R.id.footer_confirm_button:
@@ -409,9 +411,9 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
             mCurrentLat = location.getLatitude();
             mCurrentLon = location.getLongitude();
             mCurrentAccracy = location.getRadius();
-            MyApplication myApplication = new MyApplication();
-            myApplication.setCurrentLat(mCurrentLat);
-            myApplication.setCurrentLong(mCurrentLon);
+            final Data data = (Data) getActivity().getApplication();
+            data.setCurrentLat(mCurrentLat);
+            data.setCurrentLong(mCurrentLon);
             locData = new MyLocationData.Builder()
                     .accuracy(location.getRadius())
                     // 此处设置开发者获取到的方向信息，顺时针0-360
@@ -527,6 +529,7 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
         public boolean onMapPoiClick(MapPoi poi){
             choosedLat = poi.getPosition().latitude;
             choosedLon = poi.getPosition().longitude;
+            chooseName = poi.getName();
             SimpleAdapter adapter = new SimpleAdapter(getContext(),false);
             DialogPlus dialog = DialogPlus.newDialog(getContext())
                     .setAdapter(adapter)

@@ -11,7 +11,7 @@ import org.litepal.LitePalApplication;
  * Created by Warden on 2017/5/21.
  */
 
-public class MyApplication extends Application {
+public class Data extends Application {
     private static Context context;
     private double currentLat;
     private double currentLong;

@@ -21,7 +21,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.warden.myapplication.util.MyApplication;
+import com.warden.myapplication.util.Data;
 import com.warden.myapplication.R;
 import com.warden.myapplication.gson.Weather;
 import com.warden.myapplication.util.HttpUtil;
@@ -233,7 +233,7 @@ public class ThirdFragment extends Fragment {
                     status = "请求异常";
                 }
                 if (weather != null && "ok".equals(status)) {
-                    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext()).edit();
+                    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(Data.getContext()).edit();
                     editor.putString("weather", responseText);
                     editor.apply();
                     mWeatherId = weather.getHeWeather5().get(0).getBasic().getId();
@@ -242,14 +242,14 @@ public class ThirdFragment extends Fragment {
                     @Override
                     public void run() {
                         if (weather != null && "ok".equals(status)) {
-                            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext()).edit();
+                            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(Data.getContext()).edit();
                             editor.putString("weather", responseText);
                             editor.apply();
                             mWeatherId = weather.getHeWeather5().get(0).getBasic().getId();
                             showWeatherInfo(weather);
-                            Toast.makeText(MyApplication.getContext(), "天气信息已刷新", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Data.getContext(), "天气信息已刷新", Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(MyApplication.getContext(), "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Data.getContext(), "获取天气信息失败", Toast.LENGTH_SHORT).show();
                         }
                         swipeRefresh.setRefreshing(false);
                     }
@@ -262,7 +262,7 @@ public class ThirdFragment extends Fragment {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(MyApplication.getContext(), "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Data.getContext(), "获取天气信息失败", Toast.LENGTH_SHORT).show();
                         swipeRefresh.setRefreshing(false);
                     }
                 });
