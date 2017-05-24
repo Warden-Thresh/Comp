@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -69,39 +70,18 @@
             android:id="@+id/bmapView_fragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Test"/>
         </com.baidu.mapapi.map.TextureMapView>
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_alignParentBottom="true"
             android:layout_alignWithParentIfMissing="false"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="false"
-            android:layout_marginBottom="10dip">
-
-            <Button
-                android:id="@+id/pre"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_marginLeft="2dip"
-                android:layout_marginRight="2dip"
-                android:layout_weight="1.0"
-                android:background="@drawable/pre_" />
-
-            <Button
-                android:id="@+id/next"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_marginLeft="2dip"
-                android:layout_marginRight="2dip"
-                android:layout_weight="1.0"
-                android:background="@drawable/next_" />
-        </LinearLayout>
+            android:layout_marginBottom="10dip"
+            android:orientation="vertical">
+        </FrameLayout>
     </RelativeLayout>
 
 </LinearLayout>

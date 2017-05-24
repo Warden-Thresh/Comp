@@ -20,6 +20,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,16 +34,33 @@ import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.TextureMapView;
 import com.baidu.mapapi.map.UiSettings;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.search.core.SearchResult;
+import com.baidu.mapapi.search.geocode.GeoCodeOption;
+import com.baidu.mapapi.search.geocode.GeoCodeResult;
+import com.baidu.mapapi.search.geocode.GeoCoder;
+import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
+import com.baidu.platform.comapi.map.F;
+import com.orhanobut.dialogplus.DialogPlus;
+import com.orhanobut.dialogplus.OnBackPressListener;
+import com.orhanobut.dialogplus.OnCancelListener;
+import com.orhanobut.dialogplus.OnDismissListener;
+import com.orhanobut.dialogplus.OnItemClickListener;
+import com.orhanobut.dialogplus.ViewHolder;
 import com.warden.myapplication.R;
+import com.warden.myapplication.adapter.SimpleAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +74,7 @@ import java.util.List;
  * Use the {@link FirstFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FirstFragment extends Fragment implements SensorEventListener {
+public class FirstFragment extends Fragment implements SensorEventListener,OnGetGeoCoderResultListener {
     private int mRequestCode;
     public DrawerLayout drawerLayout;
     private FloatingActionButton fab;
@@ -70,6 +90,7 @@ public class FirstFragment extends Fragment implements SensorEventListener {
     private int mCurrentDirection = 0;
     private double mCurrentLat = 0.0;
     private double mCurrentLon = 0.0;
+    private BDLocation mCurrentLocation;
     private float mCurrentAccracy;
     //UI
     RadioGroup.OnCheckedChangeListener radioButtonListener;
@@ -80,6 +101,14 @@ public class FirstFragment extends Fragment implements SensorEventListener {
     private boolean isFirstLocate = true;
     private MyLocationData locData;
     public boolean querryWeather= false;
+    //GEO
+    GeoCoder mSearch = null; // 搜索模块
+
+    //dialog
+    private RadioGroup radioGroup;
+    private CheckBox headerCheckBox;
+    private CheckBox footerCheckBox;
+    private CheckBox expandedCheckBox;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -122,6 +151,8 @@ public class FirstFragment extends Fragment implements SensorEventListener {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        mSearch = GeoCoder.newInstance();
+        mSearch.setOnGetGeoCodeResultListener(this);
     }
 
     @Override
@@ -131,6 +162,7 @@ public class FirstFragment extends Fragment implements SensorEventListener {
         View view = inflater.inflate(R.layout.fragment_first, container, false);
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);//获取传感器管理服务
         mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
+        mCurrentLocation = new BDLocation();
         mMapView = (TextureMapView) view.findViewById(R.id.bmapView);
         //positionText =(TextView)view.findViewById(R.id.position_text_view) ;
         drawerLayout = (DrawerLayout) view.findViewById(R.id.drawer_layout);
@@ -140,7 +172,8 @@ public class FirstFragment extends Fragment implements SensorEventListener {
         // 定位初始化
         mLocationClient = new LocationClient(getActivity().getApplicationContext());
         mLocationClient.registerLocationListener(myListener);
-        mBaiduMap.setOnMapClickListener(listener);
+        mBaiduMap.setOnMapClickListener(onMapClickListener);
+        mBaiduMap.setOnMapLongClickListener(onMapLongClickListener);
         mBaiduMap.setOnMapLoadedCallback(new BaiduMap.OnMapLoadedCallback() {
 
             @Override
@@ -180,18 +213,17 @@ public class FirstFragment extends Fragment implements SensorEventListener {
         String longitude = prefs.getString("currentLongitude",null);
         String latitude = prefs.getString("currentLatitude",null);
         if (longitude !=null&latitude !=null){
-            BDLocation location = new BDLocation();
-            location.setLongitude(Double.parseDouble(longitude));
-            location.setLatitude(Double.parseDouble(latitude));
-            Log.d("Location:",":Latitude:"+location.getLatitude());
-            Log.d("Location:",":Longitude:"+location.getLongitude());
-            navigateTo(location);
+            mCurrentLocation.setLongitude(Double.parseDouble(longitude));
+            mCurrentLocation.setLatitude(Double.parseDouble(latitude));
+            Log.d("LastLocation:",":Latitude:"+mCurrentLocation.getLatitude());
+            Log.d("LastLocation:",":Longitude:"+mCurrentLocation.getLongitude());
+            navigateTo(mCurrentLocation);
         }
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mLocationClient.requestLocation();
+                navigateTo(mCurrentLocation);
                 switch (mCurrentMode) {
                     case NORMAL:
                         //requestLocButton.setText("跟随");
@@ -222,9 +254,35 @@ public class FirstFragment extends Fragment implements SensorEventListener {
                 }
             }
         });
+        dialog();
         return view;
     }
+private void dialog(){
+    DialogPlus dialogPlus = DialogPlus.newDialog(getContext())
+            .setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, new String[]{"asdfa"}))
+            .setCancelable(true)
+            .setOnDismissListener(new OnDismissListener() {
+                @Override
+                public void onDismiss(DialogPlus dialog) {
 
+                }
+            })
+            .setOnCancelListener(new OnCancelListener() {
+                @Override
+                public void onCancel(DialogPlus dialog) {
+
+                }
+            })
+            .setOnBackPressListener(new OnBackPressListener() {
+                @Override
+                public void onBackPressed(DialogPlus dialogPlus) {
+
+                }
+            })
+            .create();
+
+    dialogPlus.show();
+}
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -246,7 +304,7 @@ public class FirstFragment extends Fragment implements SensorEventListener {
         LocationClientOption option = new LocationClientOption();
         option.setOpenGps(true);// 打开gps
         option.setCoorType("bd09ll");
-       // option.setScanSpan(1000);
+        option.setScanSpan(2000);
         option.setIsNeedAddress(true);
         mLocationClient.setLocOption(option);
     }
@@ -278,7 +336,7 @@ public class FirstFragment extends Fragment implements SensorEventListener {
                 location.getLongitude());
         MapStatus.Builder builder = new MapStatus.Builder();
         builder.target(ll).zoom(18.0f);
-        mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+        mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()),1000);
         MyLocationData.Builder locationBuilder = new MyLocationData.Builder();
         locationBuilder
                 .accuracy(location.getRadius())
@@ -309,42 +367,67 @@ public class FirstFragment extends Fragment implements SensorEventListener {
 
     }
 
+    @Override
+    public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
+
+    }
+
+    @Override
+    public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
+        if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
+            Toast.makeText(getActivity(), "抱歉，未能找到结果", Toast.LENGTH_LONG)
+                    .show();
+            return;
+        }
+        ReverseGeoCodeResult.AddressComponent addressDetail = result.getAddressDetail();
+        mBaiduMap.clear();
+        mBaiduMap.addOverlay(new MarkerOptions().position(result.getLocation())
+                .icon(BitmapDescriptorFactory
+                        .fromResource(R.drawable.icon_marka)));
+        mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLngZoom(result
+                .getLocation(),18f), 600);
+        Toast.makeText(getActivity(), result.getSematicDescription(),
+                Toast.LENGTH_LONG).show();
+
+    }
+
     public class MyLocationListener implements BDLocationListener {
         @Override
-        public void onReceiveLocation(BDLocation bdLocation) {
-            if (bdLocation == null || mMapView == null) {
+        public void onReceiveLocation(BDLocation location) {
+            if (location == null || mMapView == null) {
                 return;
             }
+            mCurrentLat = location.getLatitude();
+            mCurrentLon = location.getLongitude();
+            mCurrentAccracy = location.getRadius();
+            locData = new MyLocationData.Builder()
+                    .accuracy(location.getRadius())
+                    // 此处设置开发者获取到的方向信息，顺时针0-360
+                    .direction(mCurrentDirection).latitude(location.getLatitude())
+                    .longitude(location.getLongitude()).build();
+            mBaiduMap.setMyLocationData(locData);
+            if (isFirstLocate) {
+                isFirstLocate = false;
+                LatLng ll = new LatLng(location.getLatitude(),
+                        location.getLongitude());
+                MapStatus.Builder builder = new MapStatus.Builder();
+                builder.target(ll).zoom(18.0f);
+                mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+            }
 
-            Log.d("Location",bdLocation.getCity()+"Altitude"+bdLocation.getAltitude()+"Longitude"+bdLocation.getLongitude());
-            if (bdLocation.getLocType() == BDLocation.TypeGpsLocation
-                    || bdLocation.getLocType() == BDLocation.TypeNetWorkLocation){
-                mCurrentLat = bdLocation.getLatitude();
-                mCurrentLon = bdLocation.getLongitude();
-                mCurrentAccracy = bdLocation.getRadius();
-                Log.d("Location","suss");
-                if (isFirstLocate){
-                    navigateTo(bdLocation);
-                    isFirstLocate = false;
-                }
-                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit();
-                editor.putString("currentLongitude", String.valueOf(bdLocation.getLongitude()));
-                editor.putString("currentLatitude", String.valueOf(bdLocation.getLatitude()));
-                editor.apply();
                 Log.d("requestCode",String.valueOf(mRequestCode));
                 if (querryWeather){
                     ThirdFragment fragment = (ThirdFragment) getActivity().getSupportFragmentManager().findFragmentByTag("third");
                     fragment.requestWeather();
                     querryWeather=false;
                 }
-            }
+
         }
 
         @Override
         public void onConnectHotSpotMessage(String s, int i) {
 
         }
-
     }
 
     @Override
@@ -380,6 +463,10 @@ public class FirstFragment extends Fragment implements SensorEventListener {
     }
     @Override
     public void onDestroy() {
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit();
+        editor.putString("currentLongitude", String.valueOf(mCurrentLon));
+        editor.putString("currentLatitude", String.valueOf(mCurrentLat));
+        editor.apply();
         // 退出时销毁定位
         mLocationClient.stop();
         super.onDestroy();
@@ -413,22 +500,59 @@ public class FirstFragment extends Fragment implements SensorEventListener {
         super.onStop();
     }
 
-    BaiduMap.OnMapClickListener listener = new BaiduMap.OnMapClickListener() {
+    BaiduMap.OnMapClickListener onMapClickListener = new BaiduMap.OnMapClickListener() {
         /**
          * 地图单击事件回调函数
          * @param point 点击的地理坐标
          */
         public void onMapClick(LatLng point){
-            Toast.makeText(getActivity(), "Map", Toast.LENGTH_SHORT).show();
+            mBaiduMap.clear();
         }
         /**
          * 地图内 Poi 单击事件回调函数
          * @param poi 点击的 poi 信息
          */
         public boolean onMapPoiClick(MapPoi poi){
-            Toast.makeText(getActivity(), "HotSpot", Toast.LENGTH_SHORT).show();
-
+            SimpleAdapter adapter = new SimpleAdapter(getContext(),false);
+            DialogPlus dialog = DialogPlus.newDialog(getContext())
+                    .setAdapter(adapter)
+                    .setExpanded(true)
+                    .setHeader(R.layout.header)
+                    .setContentHolder(new ViewHolder(R.layout.content))
+                    .setOnItemClickListener(new OnItemClickListener() {
+                        @Override
+                        public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                        }
+                    })
+                    .create();
+            dialog.show();
+            TextView textTitle = (TextView) dialog.getHeaderView().findViewById(R.id.text_title);
+            textTitle.setText(poi.getName());
+            mSearch.reverseGeoCode(new ReverseGeoCodeOption()
+                    .location(poi.getPosition()));
+            Toast.makeText(getActivity(), "Poi"+poi.getName(), Toast.LENGTH_SHORT).show();
             return true;
+        }
+    };
+    /**
+     * 发起搜索
+     *
+     * @param point
+     */
+    public void reverseGeoCode(LatLng point) {
+        // 反Geo搜索
+        mSearch.reverseGeoCode(new ReverseGeoCodeOption()
+                .location(point));
+
+    }
+
+    BaiduMap.OnMapLongClickListener onMapLongClickListener = new BaiduMap.OnMapLongClickListener() {
+        /**
+         * 地图长按事件监听回调函数
+         * @param point 长按的地理坐标
+         */
+        public void onMapLongClick(LatLng point){
+            reverseGeoCode(point);
         }
     };
 

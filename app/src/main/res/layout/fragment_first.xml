@@ -9,6 +9,23 @@
         android:id="@+id/bmapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    <FrameLayout
+        android:id="@+id/dim_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <com.arlib.floatingsearchview.FloatingSearchView
+            android:id="@+id/floating_search_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:floatingSearch_close_search_on_keyboard_dismiss="false"
+            app:floatingSearch_dimBackground="false"
+            app:floatingSearch_dismissOnOutsideTouch="true"
+            app:floatingSearch_leftActionMode="showHamburger"
+            app:floatingSearch_searchHint="Search..."
+            app:floatingSearch_showSearchKey="true"
+            app:floatingSearch_suggestionsListAnimDuration="250"
+            android:fitsSystemWindows="true"/>
+    </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -20,6 +37,4 @@
         app:backgroundTint="#6c6c6c"
         app:fabSize="mini"
         app:rippleColor="#f7f7f7" />
-
-
 </FrameLayout>
