@@ -54,6 +54,7 @@ import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.baidu.platform.comapi.map.F;
 import com.orhanobut.dialogplus.DialogPlus;
+import com.orhanobut.dialogplus.ListHolder;
 import com.orhanobut.dialogplus.OnBackPressListener;
 import com.orhanobut.dialogplus.OnCancelListener;
 import com.orhanobut.dialogplus.OnDismissListener;
@@ -516,9 +517,9 @@ private void dialog(){
             SimpleAdapter adapter = new SimpleAdapter(getContext(),false);
             DialogPlus dialog = DialogPlus.newDialog(getContext())
                     .setAdapter(adapter)
-                    .setExpanded(true)
+                    .setExpanded(true,500)
                     .setHeader(R.layout.header)
-                    .setContentHolder(new ViewHolder(R.layout.content))
+                    .setContentHolder(new ListHolder())
                     .setOnItemClickListener(new OnItemClickListener() {
                         @Override
                         public void onItemClick(DialogPlus dialog, Object item, View view, int position) {

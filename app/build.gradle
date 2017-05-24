@@ -39,5 +39,6 @@ dependencies {
     compile 'com.google.code.gson:gson:2.7'
     compile 'com.github.arimorty:floatingsearchview:2.0.4'
     compile 'com.orhanobut:dialogplus:1.11@aar'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
 }

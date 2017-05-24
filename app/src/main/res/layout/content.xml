@@ -7,13 +7,14 @@
         android:padding="@dimen/activity_horizontal_margin">
 
     <TextView
-            android:id="@+id/title"
+            android:id="@+id/location_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/question"
+            android:text="正在加载..."
             android:textSize="@dimen/header_text_size"
             android:layout_gravity="left"
             android:gravity="center_horizontal"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
             android:layout_marginBottom="@dimen/activity_horizontal_margin"/>
 
     <LinearLayout
@@ -26,7 +27,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/button_like"
+                android:text="取消"
                 android:textColor="@color/dialogplus_black_overlay"
                 android:textSize="@dimen/button_text_size"/>
 
@@ -35,10 +36,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/button_love"
+                android:text="去这里"
                 android:textColor="@color/dialogplus_black_overlay"
                 android:textSize="@dimen/button_text_size"/>
     </LinearLayout>
-
 </LinearLayout>
 

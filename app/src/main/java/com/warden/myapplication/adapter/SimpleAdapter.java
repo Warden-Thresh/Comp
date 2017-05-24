@@ -58,16 +58,16 @@ public class SimpleAdapter extends BaseAdapter {
     Context context = parent.getContext();
     switch (position) {
       case 0:
-        viewHolder.textView.setText(context.getString(R.string.google_plus_title));
-        viewHolder.imageView.setImageResource(R.drawable.ic_google_plus_icon);
+        viewHolder.textView.setText("附近地点");
+        viewHolder.imageView.setImageResource(R.drawable.ic_location_on_grey_400_36dp);
         break;
       case 1:
-        viewHolder.textView.setText(context.getString(R.string.google_maps_title));
-        viewHolder.imageView.setImageResource(R.drawable.ic_google_maps_icon);
+        viewHolder.textView.setText("正在加载...");
+        viewHolder.imageView.setImageResource(R.drawable.ic_location_on_grey_400_36dp);
         break;
       default:
-        viewHolder.textView.setText(context.getString(R.string.google_messenger_title));
-        viewHolder.imageView.setImageResource(R.drawable.ic_google_messenger_icon);
+        viewHolder.textView.setText("正在加载...");
+        viewHolder.imageView.setImageResource(R.drawable.ic_location_on_grey_400_36dp);
         break;
     }
 
