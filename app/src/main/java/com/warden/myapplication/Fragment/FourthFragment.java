@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.leon.lib.settingview.LSettingItem;
 import com.warden.myapplication.Activity.ListActivity;
 import com.warden.myapplication.Activity.LoginActivity;
@@ -77,7 +78,8 @@ public class FourthFragment extends Fragment {
         return view;
     }
     private void initView(View view){
-//        ImageView avater = (ImageView) view.findViewById(R.id.avatar) ;
+        ImageView avaterBackground = (ImageView) view.findViewById(R.id.avatar_background) ;
+        Glide.with(getContext()).load(R.drawable.user_background).centerCrop().into(avaterBackground);
         Button buttonLogin=(Button) view.findViewById(R.id.login);
         LSettingItem mSettingItemOne = (LSettingItem) view.findViewById(R.id.item_message);
         LSettingItem mSettingItemTow = (LSettingItem) view.findViewById(R.id.item_about);

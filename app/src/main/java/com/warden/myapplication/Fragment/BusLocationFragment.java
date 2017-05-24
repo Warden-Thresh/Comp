@@ -60,6 +60,7 @@ import com.baidu.platform.comapi.map.B;
 import com.baidu.platform.comapi.map.F;
 import com.warden.myapplication.Activity.MainActivity;
 import com.warden.myapplication.R;
+import com.warden.myapplication.util.Data;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -84,6 +85,8 @@ public class BusLocationFragment extends Fragment implements
     private OnFragmentInteractionListener mListener;
 
     TextureMapView mMapView;
+    private double currentLat;
+    private double currentLon;
     private Button mBtnPre = null; // 上一个节点
     private Button mBtnNext = null; // 下一个节点
     private Button mBtnSearch = null;
@@ -141,13 +144,11 @@ public class BusLocationFragment extends Fragment implements
         View view = inflater.inflate(R.layout.fragment_bus_location, container, false);
         //mBtnPre = (Button) view.findViewById(R.id.pre);
         //mBtnNext = (Button) view.findViewById(R.id.next);
+        final Data data=(Data) getActivity().getApplication();
         mBtnSearch = (Button)view.findViewById(R.id.search);
         editCity = (EditText) view.findViewById(R.id.city);
         editSearchKey = (EditText) view.findViewById(R.id.searchkey);
         searchLayout = (LinearLayout) view.findViewById(R.id.search_layout);
-        if (mParam1.equals("我的订单")){
-            searchLayout.setVisibility(View.GONE);
-        }
         mMapView = (TextureMapView) view.findViewById(R.id.bmapView_fragment);
         mBaiduMap = mMapView.getMap();
         // 开启定位图层
@@ -158,6 +159,15 @@ public class BusLocationFragment extends Fragment implements
         mBusLineSearch = BusLineSearch.newInstance();
         mBusLineSearch.setOnGetBusLineSearchResultListener(this);
         busLineIDList = new ArrayList<String>();
+        if (mParam1.equals("我的订单")){
+            searchLayout.setVisibility(View.GONE);
+            busLineIDList.clear();
+            busLineIndex = 0;
+            // 发起poi检索，从得到所有poi中找到公交线路类型的poi，再使用该poi的uid进行公交详情搜索
+            mSearch.searchInCity((new PoiCitySearchOption()).city(
+                    "昆明")
+                    .keyword("z56"));
+        }
         overlay = new BusLineOverlay(mBaiduMap);
          mBaiduMap.setOnMarkerClickListener(overlay);
         mHandler = new Handler(Looper.getMainLooper());
@@ -170,7 +180,7 @@ public class BusLocationFragment extends Fragment implements
                 // 设置指南针的位置，在 onMapLoadFinish 后生效
                 uiSettings.setCompassEnabled(true);
                 uiSettings.setOverlookingGesturesEnabled(true); //设置是否允许俯视手势
-                // uiSettings.setRotateGesturesEnabled(false); //设置是否允许旋转手势
+                uiSettings.setRotateGesturesEnabled(true); //设置是否允许旋转手势
                 // uiSettings.setScrollGesturesEnabled(false); //设置是否允许拖拽手势
                 // uiSettings.setZoomGesturesEnabled(false); //设置是否允许缩放手势
 

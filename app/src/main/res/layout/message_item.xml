@@ -5,70 +5,44 @@
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:layout_margin="10dp"
-    android:foreground="?attr/selectableItemBackground"
     app:cardCornerRadius="6dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/message_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="10dp">
-            <TextView
-                android:id="@+id/message_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:textColor="#3e3e3e"
-                android:text="亮点功能"
-                android:textSize="26sp" />
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="right"
-                android:layout_weight="1"
-                >
-                <ImageView
-                    android:id="@+id/imageView"
-                    android:layout_width="39dp"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/more" />
-            </LinearLayout>
-
-        </LinearLayout>
-
+            android:layout_gravity="left"
+            android:layout_margin="10dp"
+            android:textSize="26sp"
+            android:text="亮点功能"/>
 
         <ImageView
             android:id="@+id/fruit_image"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:layout_marginTop="3dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/test_message" />
-
+            android:src="@drawable/test_message"
+            />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="6dp">
-
             <TextView
                 android:id="@+id/message_preview"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:layout_margin="5dp"
-                android:text="提供周边最新公交查询信息,包括公交查询....."
-                android:textSize="16sp" />
-
+                android:textSize="16sp"
+                android:text="提供周边最新公交查询信息,包括公交查询....."/>
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="right"
-                android:layout_weight="1"
-                >
+                android:layout_marginTop="20dp">
 
                 <TextView
                     android:id="@+id/message_date"
