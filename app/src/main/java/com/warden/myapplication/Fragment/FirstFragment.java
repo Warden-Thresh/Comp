@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,14 +30,12 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
-import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
@@ -46,13 +43,11 @@ import com.baidu.mapapi.map.TextureMapView;
 import com.baidu.mapapi.map.UiSettings;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.core.SearchResult;
-import com.baidu.mapapi.search.geocode.GeoCodeOption;
 import com.baidu.mapapi.search.geocode.GeoCodeResult;
 import com.baidu.mapapi.search.geocode.GeoCoder;
 import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
-import com.baidu.platform.comapi.map.F;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.OnBackPressListener;
 import com.orhanobut.dialogplus.OnCancelListener;
@@ -90,7 +85,8 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
     private int mCurrentDirection = 0;
     private double mCurrentLat = 0.0;
     private double mCurrentLon = 0.0;
-    private BDLocation mCurrentLocation;
+    private BDLocation mLastlocation;
+    private BDLocation mCurrentLocation = null;
     private float mCurrentAccracy;
     //UI
     RadioGroup.OnCheckedChangeListener radioButtonListener;
@@ -162,7 +158,7 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
         View view = inflater.inflate(R.layout.fragment_first, container, false);
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);//获取传感器管理服务
         mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
-        mCurrentLocation = new BDLocation();
+        mLastlocation = new BDLocation();
         mMapView = (TextureMapView) view.findViewById(R.id.bmapView);
         //positionText =(TextView)view.findViewById(R.id.position_text_view) ;
         drawerLayout = (DrawerLayout) view.findViewById(R.id.drawer_layout);
@@ -213,17 +209,19 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
         String longitude = prefs.getString("currentLongitude",null);
         String latitude = prefs.getString("currentLatitude",null);
         if (longitude !=null&latitude !=null){
-            mCurrentLocation.setLongitude(Double.parseDouble(longitude));
-            mCurrentLocation.setLatitude(Double.parseDouble(latitude));
-            Log.d("LastLocation:",":Latitude:"+mCurrentLocation.getLatitude());
-            Log.d("LastLocation:",":Longitude:"+mCurrentLocation.getLongitude());
-            navigateTo(mCurrentLocation);
+            mLastlocation.setLongitude(Double.parseDouble(longitude));
+            mLastlocation.setLatitude(Double.parseDouble(latitude));
+            Log.d("LastLocation:",":Latitude:"+ mLastlocation.getLatitude());
+            Log.d("LastLocation:",":Longitude:"+ mLastlocation.getLongitude());
+            navigateTo(mLastlocation);
         }
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                navigateTo(mCurrentLocation);
+                if (mCurrentLocation!=null){
+                    navigateTo(mCurrentLocation);
+                }
                 switch (mCurrentMode) {
                     case NORMAL:
                         //requestLocButton.setText("跟随");
@@ -400,6 +398,8 @@ private void dialog(){
             mCurrentLat = location.getLatitude();
             mCurrentLon = location.getLongitude();
             mCurrentAccracy = location.getRadius();
+            mCurrentLocation.setLatitude(mCurrentLat);
+            mCurrentLocation.setLongitude(mCurrentLon);
             locData = new MyLocationData.Builder()
                     .accuracy(location.getRadius())
                     // 此处设置开发者获取到的方向信息，顺时针0-360
