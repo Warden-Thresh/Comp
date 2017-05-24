@@ -58,6 +58,7 @@ import com.orhanobut.dialogplus.OnBackPressListener;
 import com.orhanobut.dialogplus.OnCancelListener;
 import com.orhanobut.dialogplus.OnDismissListener;
 import com.orhanobut.dialogplus.OnItemClickListener;
+import com.orhanobut.dialogplus.ViewHolder;
 import com.warden.myapplication.R;
 import com.warden.myapplication.adapter.SimpleAdapter;
 
@@ -517,6 +518,7 @@ private void dialog(){
                     .setAdapter(adapter)
                     .setExpanded(true)
                     .setHeader(R.layout.header)
+                    .setContentHolder(new ViewHolder(R.layout.content))
                     .setOnItemClickListener(new OnItemClickListener() {
                         @Override
                         public void onItemClick(DialogPlus dialog, Object item, View view, int position) {

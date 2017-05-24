@@ -22,18 +22,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/footer_button_close"
-            android:textColor="@color/primary"
+            android:textColor="@color/colorPrimary"
             android:textSize="@dimen/button_text_size"
-            android:background="@drawable/selector_bg_button"/>
+            android:background="@drawable/ic_action_action_add_shopping_cart"/>
 
     <Button
             android:id="@+id/footer_confirm_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/footer_button_confirm"
-            android:textColor="@color/primary"
+            android:textColor="@color/colorPrimary"
             android:textSize="@dimen/button_text_size"
-            android:background="@drawable/selector_bg_button"/>
+            android:background="@drawable/credit_card"/>
 
 </LinearLayout>
 

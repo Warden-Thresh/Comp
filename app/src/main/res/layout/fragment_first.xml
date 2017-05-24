@@ -37,6 +37,4 @@
         app:backgroundTint="#6c6c6c"
         app:fabSize="mini"
         app:rippleColor="#f7f7f7" />
-
-
 </FrameLayout>

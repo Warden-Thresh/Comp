@@ -77,7 +77,7 @@ public class FourthFragment extends Fragment {
         return view;
     }
     private void initView(View view){
-        ImageView avater = (ImageView) view.findViewById(R.id.avatar) ;
+//        ImageView avater = (ImageView) view.findViewById(R.id.avatar) ;
         Button buttonLogin=(Button) view.findViewById(R.id.login);
         LSettingItem mSettingItemOne = (LSettingItem) view.findViewById(R.id.item_message);
         LSettingItem mSettingItemTow = (LSettingItem) view.findViewById(R.id.item_about);
