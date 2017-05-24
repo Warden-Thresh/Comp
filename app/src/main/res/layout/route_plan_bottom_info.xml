@@ -5,7 +5,6 @@
     android:layout_height="70dp"
     android:paddingTop="5dp"
     android:paddingBottom="5dp"
-    android:background="@drawable/bg_bottom_bar"
     android:layout_alignParentBottom="true"
     android:gravity="center_vertical">
     <LinearLayout
@@ -53,7 +52,6 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:text="详情"
-            android:textColor="@color/main_color"
             android:textSize="14sp" />
 
         <Button

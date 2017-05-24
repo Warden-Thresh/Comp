@@ -7,8 +7,8 @@
     android:orientation="vertical"
 >
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="38dp"
+        android:layout_width="63dp"
+        android:layout_height="16dp"
         android:layout_gravity="center"
         android:background="@drawable/ic_keyboard_arrow_up_grey_600_24dp"/>
 
@@ -41,7 +41,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/like_it_button"
+                android:id="@+id/cancel_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -50,7 +50,7 @@
                 android:textSize="@dimen/button_text_size"/>
 
             <Button
-                android:id="@+id/love_it_button"
+                android:id="@+id/go_to_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

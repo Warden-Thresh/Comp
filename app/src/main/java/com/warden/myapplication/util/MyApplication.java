@@ -13,6 +13,24 @@ import org.litepal.LitePalApplication;
 
 public class MyApplication extends Application {
     private static Context context;
+    private double currentLat;
+    private double currentLong;
+
+    public double getCurrentLat() {
+        return currentLat;
+    }
+
+    public void setCurrentLat(double currentLat) {
+        this.currentLat = currentLat;
+    }
+
+    public double getCurrentLong() {
+        return currentLong;
+    }
+
+    public void setCurrentLong(double currentLong) {
+        this.currentLong = currentLong;
+    }
 
     @Override
     public void onCreate() {

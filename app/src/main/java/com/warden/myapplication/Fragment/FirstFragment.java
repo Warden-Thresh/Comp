@@ -2,6 +2,7 @@ package com.warden.myapplication.Fragment;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
@@ -20,9 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,14 +30,12 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
-import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
@@ -46,22 +43,19 @@ import com.baidu.mapapi.map.TextureMapView;
 import com.baidu.mapapi.map.UiSettings;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.core.SearchResult;
-import com.baidu.mapapi.search.geocode.GeoCodeOption;
 import com.baidu.mapapi.search.geocode.GeoCodeResult;
 import com.baidu.mapapi.search.geocode.GeoCoder;
 import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
-import com.baidu.platform.comapi.map.F;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.ListHolder;
-import com.orhanobut.dialogplus.OnBackPressListener;
-import com.orhanobut.dialogplus.OnCancelListener;
-import com.orhanobut.dialogplus.OnDismissListener;
+import com.orhanobut.dialogplus.OnClickListener;
 import com.orhanobut.dialogplus.OnItemClickListener;
-import com.orhanobut.dialogplus.ViewHolder;
+import com.warden.myapplication.Activity.RoutePlanActivity;
 import com.warden.myapplication.R;
 import com.warden.myapplication.adapter.SimpleAdapter;
+import com.warden.myapplication.util.MyApplication;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +85,9 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
     private int mCurrentDirection = 0;
     private double mCurrentLat = 0.0;
     private double mCurrentLon = 0.0;
-    private BDLocation mCurrentLocation;
+    private double choosedLat;
+    private double choosedLon;
+    private BDLocation mLastLocation;
     private float mCurrentAccracy;
     //UI
     RadioGroup.OnCheckedChangeListener radioButtonListener;
@@ -110,6 +106,7 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
     private CheckBox headerCheckBox;
     private CheckBox footerCheckBox;
     private CheckBox expandedCheckBox;
+    private OnClickListener searchRouteBtnListener;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -163,7 +160,8 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
         View view = inflater.inflate(R.layout.fragment_first, container, false);
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);//获取传感器管理服务
         mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
-        mCurrentLocation = new BDLocation();
+
+        mLastLocation = new BDLocation();
         mMapView = (TextureMapView) view.findViewById(R.id.bmapView);
         //positionText =(TextView)view.findViewById(R.id.position_text_view) ;
         drawerLayout = (DrawerLayout) view.findViewById(R.id.drawer_layout);
@@ -214,19 +212,27 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
         String longitude = prefs.getString("currentLongitude",null);
         String latitude = prefs.getString("currentLatitude",null);
         if (longitude !=null&latitude !=null){
-            mCurrentLocation.setLongitude(Double.parseDouble(longitude));
-            mCurrentLocation.setLatitude(Double.parseDouble(latitude));
-            Log.d("LastLocation:",":Latitude:"+mCurrentLocation.getLatitude());
-            Log.d("LastLocation:",":Longitude:"+mCurrentLocation.getLongitude());
-            navigateTo(mCurrentLocation);
+            mLastLocation.setLongitude(Double.parseDouble(longitude));
+            mLastLocation.setLatitude(Double.parseDouble(latitude));
+            Log.d("LastLocation:",":Latitude:"+ mLastLocation.getLatitude());
+            Log.d("LastLocation:",":Longitude:"+ mLastLocation.getLongitude());
+            navigateTo(mLastLocation);
         }
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        setOnClickListener();
+        return view;
+    }
+    private  void setOnClickListener(){
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                navigateTo(mCurrentLocation);
+                BDLocation bdLocation = new BDLocation();
+                bdLocation.setLatitude(mCurrentLat);
+                bdLocation.setLongitude(mCurrentLon);
+                navigateTo(bdLocation);
                 switch (mCurrentMode) {
                     case NORMAL:
+                        Toast.makeText(getActivity(),"跟随",Toast.LENGTH_SHORT).show();
                         //requestLocButton.setText("跟随");
                         mCurrentMode = MyLocationConfiguration.LocationMode.FOLLOWING;
                         mBaiduMap.setMyLocationConfiguration(new MyLocationConfiguration(
@@ -236,6 +242,7 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
                         mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
                         break;
                     case COMPASS:
+                        Toast.makeText(getActivity(),"普通",Toast.LENGTH_SHORT).show();
                         //requestLocButton.setText("普通");
                         mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
                         mBaiduMap.setMyLocationConfiguration(new MyLocationConfiguration(
@@ -245,6 +252,7 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
                         mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder1.build()));
                         break;
                     case FOLLOWING:
+                        Toast.makeText(getActivity(),"罗盘",Toast.LENGTH_SHORT).show();
                         //requestLocButton.setText("罗盘");
                         mCurrentMode = MyLocationConfiguration.LocationMode.COMPASS;
                         mBaiduMap.setMyLocationConfiguration(new MyLocationConfiguration(
@@ -255,35 +263,35 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
                 }
             }
         });
-        dialog();
-        return view;
+        searchRouteBtnListener = new OnClickListener() {
+            @Override
+            public void onClick(DialogPlus dialog, View view) {
+                switch (view.getId()) {
+                    case R.id.header_container:
+
+                        break;
+                    case R.id.cancel_button:
+                        break;
+                    case R.id.go_to_button:
+                        Context context = getContext();
+                        Intent intent = new Intent(context, RoutePlanActivity.class);
+                        intent.putExtra("aimLat",choosedLat);
+                        intent.putExtra("aimLon",choosedLon);
+                        context.startActivity(intent);
+                        break;
+                    case R.id.footer_confirm_button:
+
+                        break;
+                    case R.id.footer_close_button:
+
+                        break;
+                }
+                dialog.dismiss();
+            }
+        };
+
     }
-private void dialog(){
-    DialogPlus dialogPlus = DialogPlus.newDialog(getContext())
-            .setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, new String[]{"asdfa"}))
-            .setCancelable(true)
-            .setOnDismissListener(new OnDismissListener() {
-                @Override
-                public void onDismiss(DialogPlus dialog) {
 
-                }
-            })
-            .setOnCancelListener(new OnCancelListener() {
-                @Override
-                public void onCancel(DialogPlus dialog) {
-
-                }
-            })
-            .setOnBackPressListener(new OnBackPressListener() {
-                @Override
-                public void onBackPressed(DialogPlus dialogPlus) {
-
-                }
-            })
-            .create();
-
-    dialogPlus.show();
-}
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -401,6 +409,9 @@ private void dialog(){
             mCurrentLat = location.getLatitude();
             mCurrentLon = location.getLongitude();
             mCurrentAccracy = location.getRadius();
+            MyApplication myApplication = new MyApplication();
+            myApplication.setCurrentLat(mCurrentLat);
+            myApplication.setCurrentLong(mCurrentLon);
             locData = new MyLocationData.Builder()
                     .accuracy(location.getRadius())
                     // 此处设置开发者获取到的方向信息，顺时针0-360
@@ -514,12 +525,15 @@ private void dialog(){
          * @param poi 点击的 poi 信息
          */
         public boolean onMapPoiClick(MapPoi poi){
+            choosedLat = poi.getPosition().latitude;
+            choosedLon = poi.getPosition().longitude;
             SimpleAdapter adapter = new SimpleAdapter(getContext(),false);
             DialogPlus dialog = DialogPlus.newDialog(getContext())
                     .setAdapter(adapter)
-                    .setExpanded(true,500)
+                    .setExpanded(true,450)
                     .setHeader(R.layout.header)
                     .setContentHolder(new ListHolder())
+                    .setOnClickListener(searchRouteBtnListener)
                     .setOnItemClickListener(new OnItemClickListener() {
                         @Override
                         public void onItemClick(DialogPlus dialog, Object item, View view, int position) {

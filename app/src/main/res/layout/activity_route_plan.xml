@@ -22,7 +22,7 @@
             android:layout_height="match_parent"
             android:visibility="gone" />
 
-        <com.amap.api.maps.MapView
+        <com.baidu.mapapi.map.MapView
             android:id="@+id/route_map"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -44,7 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="钉钉地图"
-            android:textColor="@color/main_color"
+
             android:textStyle="bold"
             android:visibility="gone"
             android:layout_above="@+id/bottom_info"
