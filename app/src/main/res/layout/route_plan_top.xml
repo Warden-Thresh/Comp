@@ -78,7 +78,7 @@
                         android:layout_marginLeft="@dimen/activity_horizontal_margin"
                         android:textColorHint="@android:color/white"
                         android:textColor="@android:color/white"
-                        android:singleLine="true"
+                        android:maxLines="1"
                         android:hint="目的地"
                         />
                 </RelativeLayout>
@@ -95,14 +95,6 @@
                 android:background="?selectableItemBackground"
                 android:tint="@android:color/white"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
-                />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1px"
-                android:background="#f2f2f2"
-                android:layout_below="@+id/rela_a2b"
-                android:layout_marginTop="10dp"
-
                 />
         </RelativeLayout>
 

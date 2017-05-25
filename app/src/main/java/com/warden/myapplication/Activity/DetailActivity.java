@@ -39,13 +39,6 @@ public class DetailActivity extends AppCompatActivity {
         String fruitContent = messageContext;
         fruitContentText.setText(fruitContent);
     }
-    private String generateFruitContent(String fruitName){
-        StringBuilder fruitContent = new StringBuilder();
-        for (int i= 1;i<500;i++){
-            fruitContent.append(fruitName);
-        }
-        return  fruitContent.toString();
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

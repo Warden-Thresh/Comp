@@ -8,4 +8,6 @@
     <color name="bg_focus">#DDDDDD</color>
     <color name="red_500">#ef4836</color>
     <color name="black">#000000</color>
+    <color name="mdtp_accent_color">#2986ff</color>
+    <color name="mdtp_accent_color_dark">#0059ff</color>
 </resources>

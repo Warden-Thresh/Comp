@@ -7,6 +7,7 @@
         <item name="colorPrimaryDark">@color/colorPrimary</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
     <style name="MyCustomTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabIndicatorColor">@color/colorPrimary</item>
         <item name="tabSelectedTextColor">@color/colorPrimary</item>
@@ -15,12 +16,14 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-    <style name="DetailActivityTheme" parent="AppTheme">
-    </style>
+
+    <style name="DetailActivityTheme" parent="AppTheme"></style>
+
     <style name="MyCheckBox" parent="AppTheme">
         <item name="colorControlNormal">#CCCCCC</item>
         <item name="colorControlActivated">#0099CC</item>
     </style>
+
     <style name="Bubble.TextAppearance.Dark" parent="android:TextAppearance.Medium">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">#ff7f7f7f</item>
@@ -35,7 +38,6 @@
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
     </style>
-
 
 
 </resources>

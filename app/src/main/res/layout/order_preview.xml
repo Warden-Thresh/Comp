@@ -10,12 +10,13 @@
     android:layout_marginTop="1dp"
     android:foreground="?attr/selectableItemBackground"
     app:cardCornerRadius="4dp">
+
   <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:orientation="vertical"
-      android:padding="@dimen/activity_horizontal_margin"
-      >
+      android:padding="@dimen/activity_horizontal_margin">
+
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
@@ -23,66 +24,59 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="@dimen/activity_horizontal_margin"
         android:gravity="center_horizontal"
-        android:text="请选择座位"
+        android:text="请确认起点和终点确认"
         android:textColor="#454545"
-        android:textSize="@dimen/header_text_size"
-        />
+        android:textSize="@dimen/header_text_size" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:visibility="gone"
-        >
+        android:orientation="horizontal">
 
       <TextView
           android:id="@+id/like_it_button"
           android:layout_width="0dp"
           android:layout_height="wrap_content"
-          android:layout_weight="1"
-          android:text="我的位置"
-          android:gravity="center"
-          android:textColor="@color/dialogplus_black_overlay"
-          android:textSize="25sp"
           android:layout_gravity="center"
-          />
+          android:layout_weight="1"
+          android:gravity="center"
+          android:maxLines="1"
+          android:text="起点"
+          android:textColor="@color/dialogplus_black_overlay"
+          android:textSize="25sp" />
+
       <ImageView
-          android:layout_width="0dp"
+          android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_weight="1"
-          android:src="@drawable/ic_arrow_forward_grey_100_36dp"
-          android:layout_gravity="center"/>
-      <TextView
-          android:id="@+id/order_aim"
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:layout_weight="1"
-          android:text="未知"
-          android:gravity="center"
-          android:textColor="@color/dialogplus_black_overlay"
-          android:textSize="25sp"
           android:layout_gravity="center"
-          />
+          android:layout_weight="0.3"
+          android:src="@drawable/arrow_right" />
+      <TextView
+          android:id="@+id/love_it_button"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center"
+          android:layout_weight="1"
+          android:gravity="center"
+          android:text="终点"
+          android:maxLines="1"
+          android:textColor="@color/dialogplus_black_overlay"
+          android:textSize="25sp" />
     </LinearLayout>
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/busset"/>
+
     <com.baidu.mapapi.map.TextureMapView
         android:id="@+id/order_preview_map"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:visibility="gone">
-    </com.baidu.mapapi.map.TextureMapView>
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_height="300dp"></com.baidu.mapapi.map.TextureMapView>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:orientation="horizontal"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="@dimen/margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/margin"
-        android:paddingBottom="@dimen/margin">
+        android:paddingTop="@dimen/margin">
 
       <TextView
           android:layout_width="0dp"
@@ -90,25 +84,25 @@
           android:layout_weight="1"
           android:text="e公交"
           android:textColor="@color/dialogplus_black_overlay"
-          android:textSize="20sp"/>
+          android:textSize="20sp" />
 
       <Button
           android:id="@+id/footer_close_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="取消"
+          android:background="#ffff"
+          android:text="@string/footer_button_close"
           android:textColor="@color/colorAccent"
-          android:textSize="@dimen/button_text_size"
-          android:background="#ffff"/>
+          android:textSize="@dimen/button_text_size" />
 
       <Button
           android:id="@+id/footer_confirm_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="确认"
+          android:background="#ffff"
+          android:text="@string/footer_button_confirm"
           android:textColor="@color/colorAccent"
-          android:textSize="@dimen/button_text_size"
-          android:background="#ffff"/>
+          android:textSize="@dimen/button_text_size" />
 
     </LinearLayout>
   </LinearLayout>
