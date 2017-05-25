@@ -45,6 +45,7 @@ import com.baidu.mapapi.overlayutil.WalkingRouteOverlay;
 import com.baidu.mapapi.search.core.RouteLine;
 import com.baidu.mapapi.search.core.SearchResult;
 import com.baidu.mapapi.search.route.BikingRouteResult;
+import com.baidu.mapapi.search.route.DrivingRoutePlanOption;
 import com.baidu.mapapi.search.route.DrivingRouteResult;
 import com.baidu.mapapi.search.route.IndoorRouteResult;
 import com.baidu.mapapi.search.route.MassTransitRouteLine;
@@ -66,6 +67,8 @@ import com.warden.myapplication.adapter.SimpleAdapter;
 import com.warden.myapplication.util.Data;
 
 import java.util.List;
+
+import okhttp3.Route;
 
 public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnMapClickListener,OnGetRoutePlanResultListener {
     private static final String TAG = RoutePlanActivity.class.getName();
@@ -110,6 +113,7 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
     Button mBtnNext = null; // 下一个节点
     int nodeIndex = -1; // 节点索引,供浏览节点时使用
     RouteLine route = null;
+    RouteLine routeReview=null;
     MassTransitRouteLine massroute = null;
     OverlayManager routeOverlay = null;
     boolean useDefaultIcon = false;
@@ -136,6 +140,7 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
     String endNodeStr = "百度科技园";
     boolean hasShownDialogue = false;
     //dialog
+    private boolean isShowDialog=false;
     DialogPlus dialog;
 
     @Override
@@ -242,12 +247,21 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         fbDesign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isShowDialog = true;
                 dialog.show();
                 orderMapView = (TextureMapView) dialog.getHolderView().findViewById(R.id.order_preview_map);
                 orderMapView.onResume();
                 mOrderBaiduMap = orderMapView.getMap();
                 mOrderBaiduMap.setMyLocationEnabled(true);
-
+                routeReview = null;
+                mOrderBaiduMap.clear();
+                // 处理搜索按钮响应
+                // 设置起终点信息，对于tranist search 来说，城市名无意义
+                PlanNode stNode = PlanNode.withLocation(new LatLng(currentLat,currentLon));
+                Log.d("current","currentLat:"+currentLat+"currentLon"+currentLon);
+                PlanNode enNode = PlanNode.withLocation(new LatLng(aimLat,aimLon));
+                mSearch.drivingSearch((new DrivingRoutePlanOption())
+                        .from(stNode).to(enNode));
             }
         });
         mImgBack.setOnClickListener(new View.OnClickListener() {
@@ -526,50 +540,59 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         }
         if (result.error == SearchResult.ERRORNO.NO_ERROR) {
             nodeIndex = -1;
-
-
-            if (result.getRouteLines().size() > 1) {
-                nowResultdrive = result;
-                if (!hasShownDialogue) {
-                    MyTransitDlg myTransitDlg = new MyTransitDlg(this,
-                            result.getRouteLines(),
-                            RouteLineAdapter.Type.DRIVING_ROUTE);
-                    myTransitDlg.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                        @Override
-                        public void onDismiss(DialogInterface dialog) {
-                            hasShownDialogue = false;
-                        }
-                    });
-                    myTransitDlg.setOnItemInDlgClickLinster(new OnItemInDlgClickListener() {
-                        public void onItemClick(int position) {
-                            route = nowResultdrive.getRouteLines().get(position);
-                            DrivingRouteOverlay overlay = new MyDrivingRouteOverlay(mBaiduMap);
-                            mBaiduMap.setOnMarkerClickListener(overlay);
-                            routeOverlay = overlay;
-                            overlay.setData(nowResultdrive.getRouteLines().get(position));
-                            overlay.addToMap();
-                            overlay.zoomToSpan();
-                        }
-
-                    });
-                    myTransitDlg.show();
-                    hasShownDialogue = true;
+            if (isShowDialog){
+                isShowDialog =false;
+                if (result.getRouteLines().size()>0){
+                    route = result.getRouteLines().get(0);
+                    DrivingRouteOverlay overlay = new MyDrivingRouteOverlay(mOrderBaiduMap);
+                    routeOverlay = overlay;
+                    overlay.setData(result.getRouteLines().get(0));
+                    overlay.addToMap();
+                    overlay.zoomToSpan();
                 }
-            } else if (result.getRouteLines().size() == 1) {
-                route = result.getRouteLines().get(0);
-                DrivingRouteOverlay overlay = new MyDrivingRouteOverlay(mBaiduMap);
-                routeOverlay = overlay;
-                mBaiduMap.setOnMarkerClickListener(overlay);
-                overlay.setData(result.getRouteLines().get(0));
-                overlay.addToMap();
-                overlay.zoomToSpan();
-                mBtnPre.setVisibility(View.VISIBLE);
-                mBtnNext.setVisibility(View.VISIBLE);
-            } else {
-                Log.d("route result", "结果数<0");
-                return;
-            }
+            }else {
+                if (result.getRouteLines().size() > 1) {
+                    nowResultdrive = result;
+                    if (!hasShownDialogue) {
+                        MyTransitDlg myTransitDlg = new MyTransitDlg(this,
+                                result.getRouteLines(),
+                                RouteLineAdapter.Type.DRIVING_ROUTE);
+                        myTransitDlg.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                hasShownDialogue = false;
+                            }
+                        });
+                        myTransitDlg.setOnItemInDlgClickLinster(new OnItemInDlgClickListener() {
+                            public void onItemClick(int position) {
+                                route = nowResultdrive.getRouteLines().get(position);
+                                DrivingRouteOverlay overlay = new MyDrivingRouteOverlay(mBaiduMap);
+                                mBaiduMap.setOnMarkerClickListener(overlay);
+                                routeOverlay = overlay;
+                                overlay.setData(nowResultdrive.getRouteLines().get(position));
+                                overlay.addToMap();
+                                overlay.zoomToSpan();
+                            }
 
+                        });
+                        myTransitDlg.show();
+                        hasShownDialogue = true;
+                    }
+                } else if (result.getRouteLines().size() == 1) {
+                    route = result.getRouteLines().get(0);
+                    DrivingRouteOverlay overlay = new MyDrivingRouteOverlay(mBaiduMap);
+                    routeOverlay = overlay;
+                    mBaiduMap.setOnMarkerClickListener(overlay);
+                    overlay.setData(result.getRouteLines().get(0));
+                    overlay.addToMap();
+                    overlay.zoomToSpan();
+                    mBtnPre.setVisibility(View.VISIBLE);
+                    mBtnNext.setVisibility(View.VISIBLE);
+                } else {
+                    Log.d("route result", "结果数<0");
+                    return;
+                }
+            }
         }
     }
 
