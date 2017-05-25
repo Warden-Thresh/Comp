@@ -84,7 +84,7 @@ public class BusLocationFragment extends Fragment implements
 
     private OnFragmentInteractionListener mListener;
 
-    TextureMapView mMapView;
+    public MapView mMapView;
     private double currentLat;
     private double currentLon;
     private Button mBtnPre = null; // 上一个节点
@@ -107,7 +107,7 @@ public class BusLocationFragment extends Fragment implements
     private static final double DISTANCE = 0.00002;
     private Marker mMoveMarker;
     private Handler mHandler;
-    public List<LatLng> busLinePoints;
+    private List<LatLng> busLinePoints;
     public BusLocationFragment() {
         // Required empty public constructor
     }
@@ -149,7 +149,7 @@ public class BusLocationFragment extends Fragment implements
         editCity = (EditText) view.findViewById(R.id.city);
         editSearchKey = (EditText) view.findViewById(R.id.searchkey);
         searchLayout = (LinearLayout) view.findViewById(R.id.search_layout);
-        mMapView = (TextureMapView) view.findViewById(R.id.bmapView_fragment);
+        mMapView = (MapView) view.findViewById(R.id.bmapView_fragment);
         mBaiduMap = mMapView.getMap();
         // 开启定位图层
         mBaiduMap.setMyLocationEnabled(true);
@@ -344,8 +344,11 @@ public class BusLocationFragment extends Fragment implements
         OverlayOptions markerOptions;
         markerOptions = new MarkerOptions().flat(true).anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory
                 .fromResource(R.drawable.marker)).position(busLinePoints.get(0)).rotate((float) getAngle(0));
-        Marker moveMarker =(Marker) mBaiduMap.addOverlay(markerOptions);
-        moveLooper(moveMarker);
+        mMoveMarker =(Marker) mBaiduMap.addOverlay(markerOptions);
+        if (mParam1.equals("我的订单")){
+            moveLooper();
+        }
+        Log.d("points",busLinePoints.toString());
         System.out.printf(busLinePoints.toString());
     }
 
@@ -470,70 +473,73 @@ public class BusLocationFragment extends Fragment implements
     /**
      * 循环进行移动逻辑
      */
-    public void moveLooper(final Marker moveMarker) {
+    public void moveLooper() {
         new Thread() {
 
             public void run() {
-                for (int i = 0; i < busLinePoints.size() - 1; i++) {
-                    final LatLng startPoint = busLinePoints.get(i);
-                    final LatLng endPoint = busLinePoints.get(i + 1);
-                    moveMarker
-                            .setPosition(startPoint);
 
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            // refresh marker's rotate
-                            //if (mMapView == null) {
-                            //  return;
-                            // }
-                            moveMarker.setRotate((float) getAngle(startPoint,
-                                    endPoint));
-                        }
-                    });
-                    double slope = getSlope(startPoint, endPoint);
-                    //是不是正向的标示（向上设为正向）
-                    boolean isReverse = (startPoint.latitude > endPoint.latitude);
+                while (true) {
 
-                    double intercept = getInterception(slope, startPoint);
-
-                    double xMoveDistance = isReverse ? getXMoveDistance(slope)
-                            : -1 * getXMoveDistance(slope);
-
-
-                    for (double j = startPoint.latitude;
-                         !((j > endPoint.latitude) ^ isReverse);
-
-                         j = j
-                                 - xMoveDistance) {
-                        LatLng latLng = null;
-                        if (slope != Double.MAX_VALUE) {
-                            latLng = new LatLng(j, (j - intercept) / slope);
-                        } else {
-                            latLng = new LatLng(j, startPoint.longitude);
-                        }
-
-                        final LatLng finalLatLng = latLng;
+                    for (int i = 0; i < busLinePoints.size() - 1; i++) {
+                        Log.d("Point"+busLinePoints.size(),i+":"+busLinePoints.get(i).toString());
+                        final LatLng startPoint = busLinePoints.get(i);
+                        final LatLng endPoint = busLinePoints.get(i+1);
+                        mMoveMarker.setPosition(startPoint);
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                    if (mMapView == null) {
-                                        return;
-                                    }
-                                // refresh marker's position
-                                moveMarker.setPosition(finalLatLng);
+                                // refresh marker's rotate
+                                if (mMapView == null) {
+                                    Log.d("Mapview==null","");
+                                    return;
+                                }
+                                mMoveMarker.setRotate((float) getAngle(startPoint,endPoint));
+                                Log.d("MoveMarker","角度"+getAngle(startPoint,endPoint));
                             }
                         });
-                        try {
-                            Thread.sleep(TIME_INTERVAL);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                        double slope = getSlope(startPoint, endPoint);
+                        // 是不是正向的标示
+                        boolean isReverse = (startPoint.latitude > endPoint.latitude);
 
+                        double intercept = getInterception(slope, startPoint);
+
+                        double xMoveDistance = isReverse ? getXMoveDistance(slope) :
+                                -1 * getXMoveDistance(slope);
+                        Log.d("MoveMarker","距离"+xMoveDistance);
+                        if (xMoveDistance ==-0){
+                            xMoveDistance=-0.1;
+                        }
+                        for (double j = startPoint.latitude; !((j > endPoint.latitude) ^ isReverse);
+                             j = j - xMoveDistance) {
+
+                            LatLng latLng = null;
+                            if (slope == Double.MAX_VALUE) {
+                                latLng = new LatLng(j, startPoint.longitude);
+                            } else {
+                                latLng = new LatLng(j, (j - intercept) / slope);
+                            }
+
+                            final LatLng finalLatLng = latLng;
+                            mHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (mMapView == null) {
+                                        Log.d("Mapview==null","");
+                                        return;
+                                    }
+                                    mMoveMarker.setPosition(finalLatLng);
+                                }
+                            });
+                            try {
+                                Thread.sleep(TIME_INTERVAL);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    }
                 }
             }
-
 
         }.start();
     }

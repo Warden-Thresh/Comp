@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -62,6 +63,7 @@ import java.util.List;
 public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnMapClickListener,OnGetRoutePlanResultListener {
     private static final String TAG = RoutePlanActivity.class.getName();
     String [] tabs={"驾车","公交","步行","骑行"};
+    FloatingActionButton fbDesign;
 
     EditText mEditStart;
 
@@ -138,10 +140,13 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         aimLat = intent.getDoubleExtra("aimLat",0.0);
         aimLon =intent.getDoubleExtra("aimLon",0.0);
         aimName = intent.getStringExtra("aimName");
-        searchRoute();
+        if (aimLat !=0.0||aimLon!=0.0){
+            searchRoute();
+        }
         navigateTo(currentLat,currentLon);
     }
     private void initView(){
+        fbDesign =(FloatingActionButton)findViewById(R.id.design_bus_bottom);
         mRecycler = (RecyclerView)findViewById(R.id.recycler);
         mRecycler.setLayoutManager(new LinearLayoutManager(this));
         mRecycler.setHasFixedSize(true);
@@ -185,6 +190,12 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         mBaiduMap.setMyLocationData(locData);
     }
     private void setOnclickListener(){
+        fbDesign.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
         mImgBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -237,6 +248,16 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         mSearch.transitSearch((new TransitRoutePlanOption())
                 .from(stNode).city("昆明").to(enNode));
         nowSearchType = 2;
+    }
+    private void searchRouteByName(){
+        route = null;
+        mBtnPre.setVisibility(View.INVISIBLE);
+        mBtnNext.setVisibility(View.INVISIBLE);
+        mBaiduMap.clear();
+        // 处理搜索按钮响应
+        // 设置起终点信息，对于tranist search 来说，城市名无意义
+        PlanNode stNode = PlanNode.withLocation(new LatLng(currentLat,currentLon));
+        PlanNode enNode = PlanNode.withLocation(new LatLng(aimLat,aimLon));
     }
 
     @Override
