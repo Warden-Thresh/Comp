@@ -175,10 +175,6 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         mMapView = (TextureMapView) findViewById(R.id.route_map);
         mBaiduMap = mMapView.getMap();
         mBaiduMap.setMyLocationEnabled(true);
-        mBtnPre = (Button) findViewById(R.id.pre);
-        mBtnNext = (Button) findViewById(R.id.next);
-        mBtnPre.setVisibility(View.INVISIBLE);
-        mBtnNext.setVisibility(View.INVISIBLE);
         // 地图点击事件处理
         mBaiduMap.setOnMapClickListener(this);
         // 初始化搜索模块，注册事件监听
@@ -277,8 +273,6 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
     public void searchRoute() {
         // 重置浏览节点的路线数据
         route = null;
-        mBtnPre.setVisibility(View.INVISIBLE);
-        mBtnNext.setVisibility(View.INVISIBLE);
         mBaiduMap.clear();
         // 处理搜索按钮响应
         // 设置起终点信息，对于tranist search 来说，城市名无意义
@@ -415,10 +409,6 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         }
         if (result.error == SearchResult.ERRORNO.NO_ERROR) {
             nodeIndex = -1;
-            mBtnPre.setVisibility(View.VISIBLE);
-            mBtnNext.setVisibility(View.VISIBLE);
-
-
             if (result.getRouteLines().size() > 1) {
                 nowResultransit = result;
                 if (!hasShownDialogue) {
@@ -546,6 +536,8 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
                     overlay.setData(result.getRouteLines().get(0));
                     overlay.addToMap();
                     overlay.zoomToSpan();
+                    TextView textView =(TextView) dialog.getHolderView().findViewById(R.id.order_aim);
+                    textView.setText(aimName);
                 }
             }else {
                 if (result.getRouteLines().size() > 1) {
@@ -861,8 +853,6 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     onItemInDlgClickListener.onItemClick(position);
-                    mBtnPre.setVisibility(View.VISIBLE);
-                    mBtnNext.setVisibility(View.VISIBLE);
                     dismiss();
                     hasShownDialogue = false;
                 }

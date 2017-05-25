@@ -27,10 +27,12 @@ import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.InfoWindow;
 import com.baidu.mapapi.map.MapPoi;
+import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
+import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.Polyline;
 import com.baidu.mapapi.map.PolylineOptions;
@@ -72,7 +74,7 @@ import com.warden.myapplication.util.Data;
  */
 public class BusLocationFragment extends Fragment implements
         OnGetPoiSearchResultListener, OnGetBusLineSearchResultListener,
-        BaiduMap.OnMapClickListener {
+        BaiduMap.OnMapClickListener,BaiduMap.OnMapLoadedCallback {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -87,6 +89,7 @@ public class BusLocationFragment extends Fragment implements
     public MapView mMapView;
     private double currentLat;
     private double currentLon;
+    private MyLocationData locData;
     private Button mBtnPre = null; // 上一个节点
     private Button mBtnNext = null; // 下一个节点
     private Button mBtnSearch = null;
@@ -145,6 +148,9 @@ public class BusLocationFragment extends Fragment implements
         //mBtnPre = (Button) view.findViewById(R.id.pre);
         //mBtnNext = (Button) view.findViewById(R.id.next);
         final Data data=(Data) getActivity().getApplication();
+        currentLat = data.getCurrentLat();
+        Log.d("current",""+currentLat);
+        currentLon = data.getCurrentLong();
         mBtnSearch = (Button)view.findViewById(R.id.search);
         editCity = (EditText) view.findViewById(R.id.city);
         editSearchKey = (EditText) view.findViewById(R.id.searchkey);
@@ -154,6 +160,7 @@ public class BusLocationFragment extends Fragment implements
         // 开启定位图层
         mBaiduMap.setMyLocationEnabled(true);
         mBaiduMap.setOnMapClickListener(this);
+        navigateTo(currentLat,currentLon);
         mSearch = PoiSearch.newInstance();
         mSearch.setOnGetPoiSearchResultListener(this);
         mBusLineSearch = BusLineSearch.newInstance();
@@ -189,6 +196,20 @@ public class BusLocationFragment extends Fragment implements
         viewListener();
         return view;
     }
+    private void navigateTo(double lat,double lon){
+
+        LatLng ll = new LatLng(lat,
+                lon);
+        MapStatus.Builder builder = new MapStatus.Builder();
+        builder.target(ll).zoom(18.0f);
+        mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()),1000);
+        MyLocationData.Builder locationBuilder = new MyLocationData.Builder();
+        locationBuilder
+                .latitude(lat)
+                .longitude(lon);
+        locData = locationBuilder.build();
+        mBaiduMap.setMyLocationData(locData);
+    }
    private void viewListener(){
         mBtnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -221,6 +242,11 @@ public class BusLocationFragment extends Fragment implements
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onMapLoaded() {
+        navigateTo(currentLat,currentLon);
     }
 
     /**
@@ -331,7 +357,7 @@ public class BusLocationFragment extends Fragment implements
                     Toast.LENGTH_LONG).show();
             return;
         }
-        mBaiduMap.clear();
+        //mBaiduMap.clear();
         route = result;
         nodeIndex = -1;
         overlay.removeFromMap();
@@ -346,10 +372,8 @@ public class BusLocationFragment extends Fragment implements
                 .fromResource(R.drawable.marker)).position(busLinePoints.get(0)).rotate((float) getAngle(0));
         mMoveMarker =(Marker) mBaiduMap.addOverlay(markerOptions);
         if (mParam1.equals("我的订单")){
-            moveLooper();
+           // moveLooper();
         }
-        Log.d("points",busLinePoints.toString());
-        System.out.printf(busLinePoints.toString());
     }
 
     @Override

@@ -60,26 +60,6 @@
             android:layout_centerVertical="false"
             android:layout_marginBottom="10dip" >
 
-            <Button
-                android:id="@+id/pre"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_marginLeft="2dip"
-                android:layout_marginRight="2dip"
-                android:layout_weight="1.0"
-                android:background="@drawable/pre_"
-                android:onClick="nodeClick" />
-
-            <Button
-
-                android:id="@+id/next"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_marginLeft="2dip"
-                android:layout_marginRight="2dip"
-                android:layout_weight="1.0"
-                android:background="@drawable/next_"
-                android:onClick="nodeClick" />
         </LinearLayout>
     </RelativeLayout>
     <android.support.design.widget.FloatingActionButton
@@ -88,6 +68,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_done"
+        android:src="@drawable/yudin"
         android:clickable="true"/>
 </android.support.design.widget.CoordinatorLayout>
