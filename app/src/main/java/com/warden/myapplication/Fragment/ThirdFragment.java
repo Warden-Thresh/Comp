@@ -74,6 +74,8 @@ public class ThirdFragment extends Fragment {
     private ImageView bingPicImg;
 
     private String mWeatherId;
+    private double currentLat;
+    private double currentLon;
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -215,10 +217,10 @@ public class ThirdFragment extends Fragment {
      * 根据天气id请求城市天气信息。
      */
     public void requestWeather() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-        String longitude = prefs.getString("currentLongitude", null);
-        String latitude = prefs.getString("currentLatitude", null);
-        String weatherId = longitude + "," + latitude;
+        final Data data = (Data) getActivity().getApplication();
+        currentLat = data.getCurrentLat();
+        currentLon = data.getCurrentLong();
+        String weatherId = currentLon + ","+currentLat;
         String weatherUrl = "https://api.heweather.com/v5/weather?city=" + weatherId + "&key=0d4a4167be61427cab63223e1c184d21";
         Log.d("URL:",weatherUrl);
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
@@ -302,12 +304,15 @@ public class ThirdFragment extends Fragment {
             pm25Text.setText(aqi.getCity().getPm25());
         }
         Weather.HeWeather5Bean.SuggestionBean suggestion =weather.getHeWeather5().get(0).getSuggestion();
-        String comfort = "舒适度：" +suggestion.getComf().getTxt();
-        String carWash = "洗车指数：" + suggestion.getCw().getTxt();
-        String sport = "运行建议：" + suggestion.getSport().getTxt();
-        comfortText.setText(comfort);
-        carWashText.setText(carWash);
-        sportText.setText(sport);
+        if (suggestion != null){
+            String comfort = "舒适度：" +suggestion.getComf().getTxt();
+            String carWash = "洗车指数：" + suggestion.getCw().getTxt();
+            String sport = "运行建议：" + suggestion.getSport().getTxt();
+            comfortText.setText(comfort);
+            carWashText.setText(carWash);
+            sportText.setText(sport);
+        }
+
     }
 
 }

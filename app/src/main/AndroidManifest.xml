@@ -70,7 +70,11 @@
         <activity android:name=".Activity.RoutePlanActivity" />
         <activity
             android:name=".Activity.SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings" />
+        <activity
+            android:name=".Activity.OrderActivity"
+            android:label="@string/title_activity_order"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

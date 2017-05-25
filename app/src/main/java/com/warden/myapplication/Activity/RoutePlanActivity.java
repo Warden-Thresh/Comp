@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -205,14 +206,12 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
                         switch (view.getId()) {
                             case R.id.header_container:
                                 break;
-                            case R.id.cancel_button:
-                                break;
-                            case R.id.go_to_button:
+                            case R.id.footer_confirm_button:
                                 Context context = RoutePlanActivity.this;
-                                Intent intent = new Intent(context, RoutePlanActivity.class);
+                                Intent intent = new Intent(context, OrderActivity.class);
                                 context.startActivity(intent);
                                 break;
-                            case R.id.footer_confirm_button:
+                            case R.id.go_to_button:
 
                                 break;
                             case R.id.footer_close_button:
@@ -873,5 +872,14 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
             onItemInDlgClickListener = itemListener;
         }
 
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
