@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.leon.lib.settingview.LSettingItem;
 import com.warden.myapplication.Activity.ListActivity;
 import com.warden.myapplication.Activity.LoginActivity;
+import com.warden.myapplication.Activity.SettingsActivity;
 import com.warden.myapplication.R;
 
 
@@ -81,9 +82,18 @@ public class FourthFragment extends Fragment {
         ImageView avaterBackground = (ImageView) view.findViewById(R.id.avatar_background) ;
         Glide.with(getContext()).load(R.drawable.user_background).centerCrop().into(avaterBackground);
         Button buttonLogin=(Button) view.findViewById(R.id.login);
-        LSettingItem mSettingItemOne = (LSettingItem) view.findViewById(R.id.item_message);
-        LSettingItem mSettingItemTow = (LSettingItem) view.findViewById(R.id.item_about);
-        mSettingItemOne.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
+        LSettingItem lSettingItemOne = (LSettingItem) view.findViewById(R.id.item_message);
+        LSettingItem lSettingItemTow = (LSettingItem) view.findViewById(R.id.item_about);
+        LSettingItem lSettingItemEight = (LSettingItem)view.findViewById(R.id.item_setting);
+        lSettingItemEight.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
+            @Override
+            public void click() {
+                Context context = getContext();
+                Intent intent = new Intent(context, SettingsActivity.class);
+                context.startActivity(intent);
+            }
+        });
+        lSettingItemOne.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
             @Override
             public void click() {
                 Context context = getContext();
@@ -93,7 +103,7 @@ public class FourthFragment extends Fragment {
             }
         });
 
-        mSettingItemTow.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
+        lSettingItemTow.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
             @Override
             public void click() {
 

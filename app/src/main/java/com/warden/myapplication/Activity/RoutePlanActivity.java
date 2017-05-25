@@ -140,7 +140,6 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
     String endNodeStr = "百度科技园";
     boolean hasShownDialogue = false;
     //dialog
-    private boolean isShowDialog=false;
     DialogPlus dialog;
 
     @Override
@@ -247,7 +246,6 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         fbDesign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isShowDialog = true;
                 dialog.show();
                 orderMapView = (TextureMapView) dialog.getHolderView().findViewById(R.id.order_preview_map);
                 orderMapView.onResume();
@@ -540,8 +538,7 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         }
         if (result.error == SearchResult.ERRORNO.NO_ERROR) {
             nodeIndex = -1;
-            if (isShowDialog){
-                isShowDialog =false;
+            if (dialog.isShowing()){
                 if (result.getRouteLines().size()>0){
                     route = result.getRouteLines().get(0);
                     DrivingRouteOverlay overlay = new MyDrivingRouteOverlay(mOrderBaiduMap);
