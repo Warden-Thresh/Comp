@@ -8,13 +8,13 @@
 
     <TextView
             android:id="@+id/location_detail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:text="正在加载..."
-            android:textSize="@dimen/header_text_size"
+            android:textSize="17sp"
             android:layout_gravity="left"
             android:gravity="center_horizontal"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
             android:layout_marginBottom="@dimen/activity_horizontal_margin"/>
 
     <LinearLayout

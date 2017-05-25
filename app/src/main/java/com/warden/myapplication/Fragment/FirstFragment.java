@@ -103,6 +103,7 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
     GeoCoder mSearch = null; // 搜索模块
 
     //dialog
+    private DialogPlus dialog;
     private RadioGroup radioGroup;
     private CheckBox headerCheckBox;
     private CheckBox footerCheckBox;
@@ -161,7 +162,7 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
         View view = inflater.inflate(R.layout.fragment_first, container, false);
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);//获取传感器管理服务
         mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
-
+        initDialog();
         mLastLocation = new BDLocation();
         mMapView = (TextureMapView) view.findViewById(R.id.bmapView);
         //positionText =(TextView)view.findViewById(R.id.position_text_view) ;
@@ -223,6 +224,48 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
         setOnClickListener();
         return view;
     }
+    private void initDialog(){
+        SimpleAdapter adapter = new SimpleAdapter(getContext(),false);
+        dialog = DialogPlus.newDialog(getContext())
+                .setAdapter(adapter)
+                .setExpanded(true,450)
+                .setHeader(R.layout.location_detail_header)
+                .setContentHolder(new ListHolder())
+                .setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(DialogPlus dialog, View view) {
+                        Toast.makeText(getActivity(),"clickDialog",Toast.LENGTH_SHORT).show();
+                        switch (view.getId()) {
+                            case R.id.header_container:
+                                break;
+                            case R.id.cancel_button:
+                                break;
+                            case R.id.go_to_button:
+                                Context context = getContext();
+                                Intent intent = new Intent(context, RoutePlanActivity.class);
+                                intent.putExtra("aimLat",choosedLat);
+                                intent.putExtra("aimLon",choosedLon);
+                                intent.putExtra("aimName",chooseName);
+                                context.startActivity(intent);
+                                break;
+                            case R.id.footer_confirm_button:
+
+                                break;
+                            case R.id.footer_close_button:
+
+                                break;
+                        }
+                        dialog.dismiss();
+                    }
+                })
+                .setOnItemClickListener(new OnItemClickListener() {
+                    @Override
+                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                        Toast.makeText(getActivity(),"item",Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .create();
+    }
     private  void setOnClickListener(){
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -264,34 +307,6 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
                 }
             }
         });
-        searchRouteBtnListener = new OnClickListener() {
-            @Override
-            public void onClick(DialogPlus dialog, View view) {
-                switch (view.getId()) {
-                    case R.id.header_container:
-
-                        break;
-                    case R.id.cancel_button:
-                        break;
-                    case R.id.go_to_button:
-                        Context context = getContext();
-                        Intent intent = new Intent(context, RoutePlanActivity.class);
-                        intent.putExtra("aimLat",choosedLat);
-                        intent.putExtra("aimLon",choosedLon);
-                        intent.putExtra("aimName",chooseName);
-                        context.startActivity(intent);
-                        break;
-                    case R.id.footer_confirm_button:
-
-                        break;
-                    case R.id.footer_close_button:
-
-                        break;
-                }
-                dialog.dismiss();
-            }
-        };
-
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -397,8 +412,8 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
                         .fromResource(R.drawable.icon_marka)));
         mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLngZoom(result
                 .getLocation(),18f), 600);
-        Toast.makeText(getActivity(), result.getSematicDescription(),
-                Toast.LENGTH_LONG).show();
+        TextView chooseLocationDetial = (TextView) dialog.getHeaderView().findViewById(R.id.choose_location_detail);
+        chooseLocationDetial.setText(result.getSematicDescription());
 
     }
 
@@ -530,25 +545,11 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
             choosedLat = poi.getPosition().latitude;
             choosedLon = poi.getPosition().longitude;
             chooseName = poi.getName();
-            SimpleAdapter adapter = new SimpleAdapter(getContext(),false);
-            DialogPlus dialog = DialogPlus.newDialog(getContext())
-                    .setAdapter(adapter)
-                    .setExpanded(true,450)
-                    .setHeader(R.layout.header)
-                    .setContentHolder(new ListHolder())
-                    .setOnClickListener(searchRouteBtnListener)
-                    .setOnItemClickListener(new OnItemClickListener() {
-                        @Override
-                        public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-                        }
-                    })
-                    .create();
             dialog.show();
             TextView textTitle = (TextView) dialog.getHeaderView().findViewById(R.id.text_title);
             textTitle.setText(poi.getName());
             mSearch.reverseGeoCode(new ReverseGeoCodeOption()
                     .location(poi.getPosition()));
-            Toast.makeText(getActivity(), "Poi"+poi.getName(), Toast.LENGTH_SHORT).show();
             return true;
         }
     };

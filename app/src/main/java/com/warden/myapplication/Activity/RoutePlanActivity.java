@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -25,7 +26,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.baidu.location.BDLocation;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
@@ -34,6 +34,7 @@ import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.TextureMapView;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.overlayutil.BikingRouteOverlay;
 import com.baidu.mapapi.overlayutil.DrivingRouteOverlay;
@@ -54,8 +55,14 @@ import com.baidu.mapapi.search.route.RoutePlanSearch;
 import com.baidu.mapapi.search.route.TransitRoutePlanOption;
 import com.baidu.mapapi.search.route.TransitRouteResult;
 import com.baidu.mapapi.search.route.WalkingRouteResult;
+import com.orhanobut.dialogplus.DialogPlus;
+import com.orhanobut.dialogplus.ListHolder;
+import com.orhanobut.dialogplus.OnClickListener;
+import com.orhanobut.dialogplus.OnItemClickListener;
+import com.orhanobut.dialogplus.ViewHolder;
 import com.warden.myapplication.R;
 import com.warden.myapplication.adapter.RouteLineAdapter;
+import com.warden.myapplication.adapter.SimpleAdapter;
 import com.warden.myapplication.util.Data;
 
 import java.util.List;
@@ -110,8 +117,10 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
 
     // 地图相关，使用继承MapView的MyRouteMapView目的是重写touch事件实现泡泡处理
     // 如果不处理touch事件，则无需继承，直接使用MapView即可
-    MapView mMapView = null;    // 地图View
+    TextureMapView mMapView = null;// 地图View
     BaiduMap mBaiduMap = null;
+    TextureMapView orderMapView =null;
+    BaiduMap mOrderBaiduMap= null;
     // 搜索相关
     RoutePlanSearch mSearch = null;    // 搜索模块，也可去掉地图模块独立使用
 
@@ -126,26 +135,29 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
     String startNodeStr = "西二旗地铁站";
     String endNodeStr = "百度科技园";
     boolean hasShownDialogue = false;
+    //dialog
+    DialogPlus dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_route_plan);
+        Intent intent = getIntent();
+        aimLat = intent.getDoubleExtra("aimLat",0.0);
+        aimLon =intent.getDoubleExtra("aimLon",0.0);
+        aimName = intent.getStringExtra("aimName");
         initView();
         final Data data = (Data) getApplication();
         currentLat = data.getCurrentLat();
         currentLon = data.getCurrentLong();
         setOnclickListener();
-        Intent intent = getIntent();
-        aimLat = intent.getDoubleExtra("aimLat",0.0);
-        aimLon =intent.getDoubleExtra("aimLon",0.0);
-        aimName = intent.getStringExtra("aimName");
         if (aimLat !=0.0||aimLon!=0.0){
             searchRoute();
         }
         navigateTo(currentLat,currentLon);
     }
     private void initView(){
+        initDialog();
         fbDesign =(FloatingActionButton)findViewById(R.id.design_bus_bottom);
         mRecycler = (RecyclerView)findViewById(R.id.recycler);
         mRecycler.setLayoutManager(new LinearLayoutManager(this));
@@ -156,7 +168,7 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
         addTabs();
         // 初始化地图
-        mMapView = (MapView) findViewById(R.id.route_map);
+        mMapView = (TextureMapView) findViewById(R.id.route_map);
         mBaiduMap = mMapView.getMap();
         mBaiduMap.setMyLocationEnabled(true);
         mBtnPre = (Button) findViewById(R.id.pre);
@@ -174,6 +186,43 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
             mTabLayout.addTab(mTabLayout.newTab().setText(tabs[i]));
         }
         mTabLayout.setScrollPosition(1,0,true);
+    }
+    private void initDialog(){
+        SimpleAdapter adapter = new SimpleAdapter(RoutePlanActivity.this,false);
+        dialog = DialogPlus.newDialog(RoutePlanActivity.this)
+                .setAdapter(adapter)
+                .setExpanded(false)
+                .setGravity(Gravity.CENTER)
+                .setContentHolder(new ViewHolder(R.layout.order_preview))
+                .setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(DialogPlus dialog, View view) {
+                        Toast.makeText(RoutePlanActivity.this,"clickDialog",Toast.LENGTH_SHORT).show();
+                        switch (view.getId()) {
+                            case R.id.header_container:
+                                break;
+                            case R.id.cancel_button:
+                                break;
+                            case R.id.go_to_button:
+                                Context context = RoutePlanActivity.this;
+                                Intent intent = new Intent(context, RoutePlanActivity.class);
+                                context.startActivity(intent);
+                                break;
+                            case R.id.footer_confirm_button:
+
+                                break;
+                            case R.id.footer_close_button:
+
+                                break;
+                        }
+                    }
+                })
+                .setOnItemClickListener(new OnItemClickListener() {
+                    @Override
+                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                    }
+                })
+                .create();
     }
     private void navigateTo(double lat,double lon){
 
@@ -193,6 +242,11 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         fbDesign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dialog.show();
+                orderMapView = (TextureMapView) dialog.getHolderView().findViewById(R.id.order_preview_map);
+                orderMapView.onResume();
+                mOrderBaiduMap = orderMapView.getMap();
+                mOrderBaiduMap.setMyLocationEnabled(true);
 
             }
         });

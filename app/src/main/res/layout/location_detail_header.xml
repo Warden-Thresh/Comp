@@ -17,6 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_marginLeft="10dp"
 >
 
         <TextView
@@ -27,11 +28,13 @@
             android:text="地图上的点"
             android:textSize="@dimen/header_text_size"/>
         <TextView
-            android:id="@+id/location_detail"
+            android:id="@+id/choose_location_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="正在加载..."
+            android:ellipsize="end"
             android:textSize="@dimen/title_text_size"
+            android:maxLines="1"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="@dimen/activity_horizontal_margin"/>
 
