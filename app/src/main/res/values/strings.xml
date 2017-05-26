@@ -135,6 +135,10 @@
     <string name="action_location">action location</string>
     <string name="action_taxi">action taxi</string>
     <string name="action_change_colors">change style</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_activity_pansseger">PanssegerActivity</string>
+    <string name="title_activity_electric_ticket">ElectricTicketActivity</string>
+    <string name="title_activity_colloction">ColloctionActivity</string>
 
 
 </resources>

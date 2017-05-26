@@ -33,7 +33,6 @@ import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
-import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.TextureMapView;
 import com.baidu.mapapi.model.LatLng;
@@ -58,7 +57,6 @@ import com.baidu.mapapi.search.route.TransitRoutePlanOption;
 import com.baidu.mapapi.search.route.TransitRouteResult;
 import com.baidu.mapapi.search.route.WalkingRouteResult;
 import com.orhanobut.dialogplus.DialogPlus;
-import com.orhanobut.dialogplus.ListHolder;
 import com.orhanobut.dialogplus.OnClickListener;
 import com.orhanobut.dialogplus.OnItemClickListener;
 import com.orhanobut.dialogplus.ViewHolder;
@@ -68,8 +66,6 @@ import com.warden.myapplication.adapter.SimpleAdapter;
 import com.warden.myapplication.util.Data;
 
 import java.util.List;
-
-import okhttp3.Route;
 
 public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnMapClickListener,OnGetRoutePlanResultListener {
     private static final String TAG = RoutePlanActivity.class.getName();
@@ -204,7 +200,7 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
                                 break;
                             case R.id.footer_confirm_button:
                                 Context context = RoutePlanActivity.this;
-                                Intent intent = new Intent(context, OrderActivity.class);
+                                Intent intent = new Intent(context, OrderComfirmActivity.class);
                                 intent.putExtra("aimLat",aimLat);
                                 intent.putExtra("aimLon",aimLon);
                                 intent.putExtra("aimName",aimName);

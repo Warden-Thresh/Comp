@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.warden.myapplication.Activity.OrderActivity"
-    tools:showIn="@layout/activity_order">
+    tools:context="com.warden.myapplication.Activity.ElectricTicketActivity"
+    tools:showIn="@layout/activity_electric_ticket">
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"

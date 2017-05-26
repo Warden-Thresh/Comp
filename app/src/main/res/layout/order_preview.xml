@@ -90,7 +90,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:background="#ffff"
-          android:text="@string/footer_button_close"
+          android:text="取消"
           android:textColor="@color/colorAccent"
           android:textSize="@dimen/button_text_size" />
 
@@ -99,7 +99,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:background="#ffff"
-          android:text="@string/footer_button_confirm"
+          android:text="确认"
           android:textColor="@color/colorAccent"
           android:textSize="@dimen/button_text_size" />
 

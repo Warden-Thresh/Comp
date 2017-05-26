@@ -72,8 +72,28 @@
             android:name=".Activity.SettingsActivity"
             android:label="@string/title_activity_settings" />
         <activity
+            android:name=".Activity.OrderComfirmActivity"
+            android:label="@string/title_activity_order"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Activity.Main2Activity"
+            android:label="@string/title_activity_main2"
+            android:theme="@style/AppTheme" />
+        <activity
             android:name=".Activity.OrderActivity"
             android:label="@string/title_activity_order"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Activity.PanssegerInformationActivity"
+            android:label="@string/title_activity_pansseger"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Activity.ElectricTicketActivity"
+            android:label="@string/title_activity_electric_ticket"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Activity.ColloctionActivity"
+            android:label="@string/title_activity_colloction"
             android:theme="@style/AppTheme"></activity>
     </application>
 
