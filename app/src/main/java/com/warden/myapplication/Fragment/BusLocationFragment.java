@@ -27,10 +27,12 @@ import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.InfoWindow;
 import com.baidu.mapapi.map.MapPoi;
+import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
+import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.Polyline;
 import com.baidu.mapapi.map.PolylineOptions;
@@ -60,6 +62,7 @@ import com.baidu.platform.comapi.map.B;
 import com.baidu.platform.comapi.map.F;
 import com.warden.myapplication.Activity.MainActivity;
 import com.warden.myapplication.R;
+import com.warden.myapplication.util.Data;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -71,7 +74,7 @@ import com.warden.myapplication.R;
  */
 public class BusLocationFragment extends Fragment implements
         OnGetPoiSearchResultListener, OnGetBusLineSearchResultListener,
-        BaiduMap.OnMapClickListener {
+        BaiduMap.OnMapClickListener,BaiduMap.OnMapLoadedCallback {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -83,7 +86,10 @@ public class BusLocationFragment extends Fragment implements
 
     private OnFragmentInteractionListener mListener;
 
-    TextureMapView mMapView;
+    public MapView mMapView;
+    private double currentLat;
+    private double currentLon;
+    private MyLocationData locData;
     private Button mBtnPre = null; // 上一个节点
     private Button mBtnNext = null; // 下一个节点
     private Button mBtnSearch = null;
@@ -104,7 +110,7 @@ public class BusLocationFragment extends Fragment implements
     private static final double DISTANCE = 0.00002;
     private Marker mMoveMarker;
     private Handler mHandler;
-    public List<LatLng> busLinePoints;
+    private List<LatLng> busLinePoints;
     public BusLocationFragment() {
         // Required empty public constructor
     }
@@ -141,23 +147,34 @@ public class BusLocationFragment extends Fragment implements
         View view = inflater.inflate(R.layout.fragment_bus_location, container, false);
         //mBtnPre = (Button) view.findViewById(R.id.pre);
         //mBtnNext = (Button) view.findViewById(R.id.next);
+        final Data data=(Data) getActivity().getApplication();
+        currentLat = data.getCurrentLat();
+        Log.d("current",""+currentLat);
+        currentLon = data.getCurrentLong();
         mBtnSearch = (Button)view.findViewById(R.id.search);
         editCity = (EditText) view.findViewById(R.id.city);
         editSearchKey = (EditText) view.findViewById(R.id.searchkey);
         searchLayout = (LinearLayout) view.findViewById(R.id.search_layout);
-        if (mParam1.equals("我的订单")){
-            searchLayout.setVisibility(View.GONE);
-        }
-        mMapView = (TextureMapView) view.findViewById(R.id.bmapView_fragment);
+        mMapView = (MapView) view.findViewById(R.id.bmapView_fragment);
         mBaiduMap = mMapView.getMap();
         // 开启定位图层
         mBaiduMap.setMyLocationEnabled(true);
         mBaiduMap.setOnMapClickListener(this);
+        navigateTo(currentLat,currentLon);
         mSearch = PoiSearch.newInstance();
         mSearch.setOnGetPoiSearchResultListener(this);
         mBusLineSearch = BusLineSearch.newInstance();
         mBusLineSearch.setOnGetBusLineSearchResultListener(this);
         busLineIDList = new ArrayList<String>();
+        if (mParam1.equals("我的订单")){
+            searchLayout.setVisibility(View.GONE);
+            busLineIDList.clear();
+            busLineIndex = 0;
+            // 发起poi检索，从得到所有poi中找到公交线路类型的poi，再使用该poi的uid进行公交详情搜索
+            mSearch.searchInCity((new PoiCitySearchOption()).city(
+                    "昆明")
+                    .keyword("z56"));
+        }
         overlay = new BusLineOverlay(mBaiduMap);
          mBaiduMap.setOnMarkerClickListener(overlay);
         mHandler = new Handler(Looper.getMainLooper());
@@ -170,7 +187,7 @@ public class BusLocationFragment extends Fragment implements
                 // 设置指南针的位置，在 onMapLoadFinish 后生效
                 uiSettings.setCompassEnabled(true);
                 uiSettings.setOverlookingGesturesEnabled(true); //设置是否允许俯视手势
-                // uiSettings.setRotateGesturesEnabled(false); //设置是否允许旋转手势
+                uiSettings.setRotateGesturesEnabled(true); //设置是否允许旋转手势
                 // uiSettings.setScrollGesturesEnabled(false); //设置是否允许拖拽手势
                 // uiSettings.setZoomGesturesEnabled(false); //设置是否允许缩放手势
 
@@ -178,6 +195,20 @@ public class BusLocationFragment extends Fragment implements
         });
         viewListener();
         return view;
+    }
+    private void navigateTo(double lat,double lon){
+
+        LatLng ll = new LatLng(lat,
+                lon);
+        MapStatus.Builder builder = new MapStatus.Builder();
+        builder.target(ll).zoom(18.0f);
+        mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()),1000);
+        MyLocationData.Builder locationBuilder = new MyLocationData.Builder();
+        locationBuilder
+                .latitude(lat)
+                .longitude(lon);
+        locData = locationBuilder.build();
+        mBaiduMap.setMyLocationData(locData);
     }
    private void viewListener(){
         mBtnSearch.setOnClickListener(new View.OnClickListener() {
@@ -211,6 +242,11 @@ public class BusLocationFragment extends Fragment implements
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onMapLoaded() {
+        navigateTo(currentLat,currentLon);
     }
 
     /**
@@ -321,7 +357,7 @@ public class BusLocationFragment extends Fragment implements
                     Toast.LENGTH_LONG).show();
             return;
         }
-        mBaiduMap.clear();
+        //mBaiduMap.clear();
         route = result;
         nodeIndex = -1;
         overlay.removeFromMap();
@@ -334,9 +370,10 @@ public class BusLocationFragment extends Fragment implements
         OverlayOptions markerOptions;
         markerOptions = new MarkerOptions().flat(true).anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory
                 .fromResource(R.drawable.marker)).position(busLinePoints.get(0)).rotate((float) getAngle(0));
-        Marker moveMarker =(Marker) mBaiduMap.addOverlay(markerOptions);
-        moveLooper(moveMarker);
-        System.out.printf(busLinePoints.toString());
+        mMoveMarker =(Marker) mBaiduMap.addOverlay(markerOptions);
+        if (mParam1.equals("我的订单")){
+           // moveLooper();
+        }
     }
 
     @Override
@@ -460,70 +497,73 @@ public class BusLocationFragment extends Fragment implements
     /**
      * 循环进行移动逻辑
      */
-    public void moveLooper(final Marker moveMarker) {
+    public void moveLooper() {
         new Thread() {
 
             public void run() {
-                for (int i = 0; i < busLinePoints.size() - 1; i++) {
-                    final LatLng startPoint = busLinePoints.get(i);
-                    final LatLng endPoint = busLinePoints.get(i + 1);
-                    moveMarker
-                            .setPosition(startPoint);
 
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            // refresh marker's rotate
-                            //if (mMapView == null) {
-                            //  return;
-                            // }
-                            moveMarker.setRotate((float) getAngle(startPoint,
-                                    endPoint));
-                        }
-                    });
-                    double slope = getSlope(startPoint, endPoint);
-                    //是不是正向的标示（向上设为正向）
-                    boolean isReverse = (startPoint.latitude > endPoint.latitude);
+                while (true) {
 
-                    double intercept = getInterception(slope, startPoint);
-
-                    double xMoveDistance = isReverse ? getXMoveDistance(slope)
-                            : -1 * getXMoveDistance(slope);
-
-
-                    for (double j = startPoint.latitude;
-                         !((j > endPoint.latitude) ^ isReverse);
-
-                         j = j
-                                 - xMoveDistance) {
-                        LatLng latLng = null;
-                        if (slope != Double.MAX_VALUE) {
-                            latLng = new LatLng(j, (j - intercept) / slope);
-                        } else {
-                            latLng = new LatLng(j, startPoint.longitude);
-                        }
-
-                        final LatLng finalLatLng = latLng;
+                    for (int i = 0; i < busLinePoints.size() - 1; i++) {
+                        Log.d("Point"+busLinePoints.size(),i+":"+busLinePoints.get(i).toString());
+                        final LatLng startPoint = busLinePoints.get(i);
+                        final LatLng endPoint = busLinePoints.get(i+1);
+                        mMoveMarker.setPosition(startPoint);
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                    if (mMapView == null) {
-                                        return;
-                                    }
-                                // refresh marker's position
-                                moveMarker.setPosition(finalLatLng);
+                                // refresh marker's rotate
+                                if (mMapView == null) {
+                                    Log.d("Mapview==null","");
+                                    return;
+                                }
+                                mMoveMarker.setRotate((float) getAngle(startPoint,endPoint));
+                                Log.d("MoveMarker","角度"+getAngle(startPoint,endPoint));
                             }
                         });
-                        try {
-                            Thread.sleep(TIME_INTERVAL);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                        double slope = getSlope(startPoint, endPoint);
+                        // 是不是正向的标示
+                        boolean isReverse = (startPoint.latitude > endPoint.latitude);
 
+                        double intercept = getInterception(slope, startPoint);
+
+                        double xMoveDistance = isReverse ? getXMoveDistance(slope) :
+                                -1 * getXMoveDistance(slope);
+                        Log.d("MoveMarker","距离"+xMoveDistance);
+                        if (xMoveDistance ==-0){
+                            xMoveDistance=-0.1;
+                        }
+                        for (double j = startPoint.latitude; !((j > endPoint.latitude) ^ isReverse);
+                             j = j - xMoveDistance) {
+
+                            LatLng latLng = null;
+                            if (slope == Double.MAX_VALUE) {
+                                latLng = new LatLng(j, startPoint.longitude);
+                            } else {
+                                latLng = new LatLng(j, (j - intercept) / slope);
+                            }
+
+                            final LatLng finalLatLng = latLng;
+                            mHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (mMapView == null) {
+                                        Log.d("Mapview==null","");
+                                        return;
+                                    }
+                                    mMoveMarker.setPosition(finalLatLng);
+                                }
+                            });
+                            try {
+                                Thread.sleep(TIME_INTERVAL);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    }
                 }
             }
-
 
         }.start();
     }

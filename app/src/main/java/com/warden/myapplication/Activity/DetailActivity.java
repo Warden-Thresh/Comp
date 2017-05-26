@@ -21,7 +21,7 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fruit);
+        setContentView(R.layout.activity_detail);
         Intent intent = getIntent();
         String messageTitle = intent.getStringExtra(MESSAGE_TITLE);
         String messageContext = intent.getStringExtra(MESSAGE_CONTEXT);
@@ -38,13 +38,6 @@ public class DetailActivity extends AppCompatActivity {
         Glide.with(this).load(R.drawable.test_message).into(fruitImageView);
         String fruitContent = messageContext;
         fruitContentText.setText(fruitContent);
-    }
-    private String generateFruitContent(String fruitName){
-        StringBuilder fruitContent = new StringBuilder();
-        for (int i= 1;i<500;i++){
-            fruitContent.append(fruitName);
-        }
-        return  fruitContent.toString();
     }
 
     @Override

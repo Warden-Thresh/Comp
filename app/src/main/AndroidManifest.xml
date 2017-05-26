@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.warden.myapplication">
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -19,7 +20,7 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
-        android:name=".util.MyApplication"
+        android:name=".util.Data"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -60,12 +61,48 @@
              Note that the API key is linked to the encryption key used to sign the APK.
              You need a different API key for each encryption key, including the release key that is used to
              sign the APK for publishing.
-             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
+             You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <activity android:name=".Activity.RoutePlanActivity" />
+        <activity
+            android:name=".Activity.SettingsActivity"
+            android:label="@string/title_activity_settings" />
+        <activity
+            android:name=".Activity.OrderComfirmActivity"
+            android:label="@string/title_activity_order"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Activity.Main2Activity"
+            android:label="@string/title_activity_main2"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Activity.OrderActivity"
+            android:label="@string/title_activity_order"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Activity.PanssegerInformationActivity"
+            android:label="@string/title_activity_pansseger"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Activity.ElectricTicketActivity"
+            android:label="@string/title_activity_electric_ticket"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Activity.ColloctionActivity"
+            android:label="@string/title_activity_colloction"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Activity.FeedBackActivity"
+            android:label="@string/title_activity_feed_back"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Activity.AboutActivity"
+            android:label="@string/title_activity_about"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

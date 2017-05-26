@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/header_container"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+>
+    <Button
+        android:layout_width="63dp"
+        android:layout_height="16dp"
+        android:layout_gravity="center"
+        android:background="@drawable/ic_keyboard_arrow_up_grey_600_24dp"/>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="10dp"
+>
+
+        <TextView
+            android:id="@+id/text_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="地图上的点"
+            android:textSize="@dimen/header_text_size"/>
+        <TextView
+            android:id="@+id/choose_location_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="正在加载..."
+            android:ellipsize="end"
+            android:textSize="@dimen/title_text_size"
+            android:maxLines="1"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="@dimen/activity_horizontal_margin"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/cancel_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="取消"
+                android:textColor="@color/dialogplus_black_overlay"
+                android:textSize="@dimen/button_text_size"/>
+
+            <Button
+                android:id="@+id/go_to_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="去这里"
+                android:textColor="@color/dialogplus_black_overlay"
+                android:textSize="@dimen/button_text_size"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>
+

@@ -21,8 +21,12 @@
             app:floatingSearch_dimBackground="false"
             app:floatingSearch_dismissOnOutsideTouch="true"
             app:floatingSearch_leftActionMode="showHamburger"
+            app:floatingSearch_menu="@menu/menu_search_view"
             app:floatingSearch_searchHint="Search..."
             app:floatingSearch_showSearchKey="true"
+            app:floatingSearch_searchBarMarginLeft="5dp"
+            app:floatingSearch_searchBarMarginRight="5dp"
+            app:floatingSearch_searchBarMarginTop="5dp"
             app:floatingSearch_suggestionsListAnimDuration="250"
             android:fitsSystemWindows="true"/>
     </FrameLayout>
@@ -36,5 +40,6 @@
         android:src="@drawable/position"
         app:backgroundTint="#6c6c6c"
         app:fabSize="mini"
-        app:rippleColor="#f7f7f7" />
+        app:rippleColor="#f7f7f7"
+        />
 </FrameLayout>
