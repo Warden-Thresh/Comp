@@ -37,9 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|left"
         android:layout_margin="16dp"
-        android:src="@drawable/position"
-        app:backgroundTint="#6c6c6c"
-        app:fabSize="mini"
-        app:rippleColor="#f7f7f7"
-        />
+        android:src="@drawable/ic_my_location_black_24dp"
+        app:backgroundTint="@color/mdtp_white"
+        app:fabSize="mini" />
 </FrameLayout>

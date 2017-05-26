@@ -1,6 +1,7 @@
 package com.warden.myapplication.Fragment;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -69,7 +70,7 @@ import java.util.List;
  * Use the {@link FirstFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FirstFragment extends Fragment implements SensorEventListener,OnGetGeoCoderResultListener {
+public class FirstFragment extends Fragment implements SensorEventListener,OnGetGeoCoderResultListener ,BaiduMap.OnMapLoadedCallback{
     private int mRequestCode;
     public DrawerLayout drawerLayout;
     private FloatingActionButton fab;
@@ -98,6 +99,7 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
     private BaiduMap mBaiduMap;
     private boolean isFirstLocate = true;
     private MyLocationData locData;
+    private BDLocation mBdlocation;
     public boolean querryWeather= false;
     //GEO
     GeoCoder mSearch = null; // 搜索模块
@@ -175,21 +177,8 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
         mLocationClient.registerLocationListener(myListener);
         mBaiduMap.setOnMapClickListener(onMapClickListener);
         mBaiduMap.setOnMapLongClickListener(onMapLongClickListener);
-        mBaiduMap.setOnMapLoadedCallback(new BaiduMap.OnMapLoadedCallback() {
+        mBaiduMap.setOnMapLoadedCallback(this);
 
-            @Override
-            public void onMapLoaded() {
-                UiSettings uiSettings = mBaiduMap.getUiSettings();
-                // uiSettings.setCompassEnabled(false); // 是否显示指南针
-                // 设置指南针的位置，在 onMapLoadFinish 后生效
-                uiSettings.setCompassEnabled(true);
-                uiSettings.setOverlookingGesturesEnabled(true); //设置是否允许俯视手势
-                // uiSettings.setRotateGesturesEnabled(false); //设置是否允许旋转手势
-                // uiSettings.setScrollGesturesEnabled(false); //设置是否允许拖拽手势
-                // uiSettings.setZoomGesturesEnabled(false); //设置是否允许缩放手势
-
-            }
-        });
 
         List<String> permissionList = new ArrayList<>();
         if (ContextCompat.checkSelfPermission(getActivity(),
@@ -218,11 +207,27 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
             mLastLocation.setLatitude(Double.parseDouble(latitude));
             Log.d("LastLocation:",":Latitude:"+ mLastLocation.getLatitude());
             Log.d("LastLocation:",":Longitude:"+ mLastLocation.getLongitude());
-            navigateTo(mLastLocation);
+            navigateToLast(mLastLocation);
+
         }
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
         setOnClickListener();
         return view;
+    }
+    private void navigateToLast(BDLocation location){
+
+        LatLng ll = new LatLng(location.getLatitude(),
+                location.getLongitude());
+        MapStatus.Builder builder = new MapStatus.Builder();
+        builder.target(ll).zoom(10.0f);
+        mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+        MyLocationData.Builder locationBuilder = new MyLocationData.Builder();
+        locationBuilder
+                .accuracy(location.getRadius())
+                .latitude(location.getLatitude())
+                .longitude(location.getLongitude());
+        locData = locationBuilder.build();
+        mBaiduMap.setMyLocationData(locData);
     }
     private void initDialog(){
         SimpleAdapter adapter = new SimpleAdapter(getContext(),false);
@@ -362,7 +367,7 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
                 location.getLongitude());
         MapStatus.Builder builder = new MapStatus.Builder();
         builder.target(ll).zoom(18.0f);
-        mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()),1000);
+        mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()),2500);
         MyLocationData.Builder locationBuilder = new MyLocationData.Builder();
         locationBuilder
                 .accuracy(location.getRadius())
@@ -385,7 +390,6 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
             mBaiduMap.setMyLocationData(locData);
         }
         lastX = x;
-
     }
 
     @Override
@@ -411,15 +415,23 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
                 .icon(BitmapDescriptorFactory
                         .fromResource(R.drawable.icon_marka)));
         mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLngZoom(result
-                .getLocation(),18f), 600);
+                .getLocation(),18f), 800);
         TextView chooseLocationDetial = (TextView) dialog.getHeaderView().findViewById(R.id.choose_location_detail);
         chooseLocationDetial.setText(result.getSematicDescription());
+
+    }
+
+    @Override
+    public void onMapLoaded() {
+        navigateTo(mBdlocation);
+        Log.d("MapLoaded","");
 
     }
 
     public class MyLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation location) {
+            mBdlocation = location;
             if (location == null || mMapView == null) {
                 return;
             }
@@ -435,22 +447,11 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
                     .direction(mCurrentDirection).latitude(location.getLatitude())
                     .longitude(location.getLongitude()).build();
             mBaiduMap.setMyLocationData(locData);
-            if (isFirstLocate) {
-                isFirstLocate = false;
-                LatLng ll = new LatLng(location.getLatitude(),
-                        location.getLongitude());
-                MapStatus.Builder builder = new MapStatus.Builder();
-                builder.target(ll).zoom(18.0f);
-                mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
-            }
-
-                Log.d("requestCode",String.valueOf(mRequestCode));
-                if (querryWeather){
-                    ThirdFragment fragment = (ThirdFragment) getActivity().getSupportFragmentManager().findFragmentByTag("third");
-                    fragment.requestWeather();
-                    querryWeather=false;
+            if(location.getLocType() == BDLocation.TypeNetWorkLocation||location.getLocType()== BDLocation.TypeGpsLocation||location.getLocType()==BDLocation.TypeOffLineLocation){
+                if (isFirstLocate) {
+                    isFirstLocate = false;
                 }
-
+            }
         }
 
         @Override

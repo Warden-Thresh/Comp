@@ -315,4 +315,9 @@ public class ThirdFragment extends Fragment {
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        requestWeather();
+    }
 }
