@@ -205,6 +205,9 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
                             case R.id.footer_confirm_button:
                                 Context context = RoutePlanActivity.this;
                                 Intent intent = new Intent(context, OrderActivity.class);
+                                intent.putExtra("aimLat",aimLat);
+                                intent.putExtra("aimLon",aimLon);
+                                intent.putExtra("aimName",aimName);
                                 context.startActivity(intent);
                                 break;
                             case R.id.go_to_button:

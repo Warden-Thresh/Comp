@@ -1,5 +1,6 @@
 package com.warden.myapplication.Activity;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -12,13 +13,23 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.baidu.mapapi.map.MyLocationData;
 import com.warden.myapplication.R;
+import com.warden.myapplication.util.Data;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.util.Calendar;
 
 public class OrderActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener,TimePickerDialog.OnTimeSetListener{
+    //目的地信息
+    public double aimLat;
+    public double aimLon;
+    public String aimName;
+    //当前位置
+    private MyLocationData locData;
+    private double currentLat;
+    private double currentLon;
     private String endLocationName;
     private String startLocationName;
     private String date;
@@ -32,6 +43,13 @@ public class OrderActivity extends AppCompatActivity implements DatePickerDialog
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
+        Intent intent = getIntent();
+        aimLat = intent.getDoubleExtra("aimLat",0.0);
+        aimLon =intent.getDoubleExtra("aimLon",0.0);
+        aimName = intent.getStringExtra("aimName");
+        final Data data = (Data) getApplication();
+        currentLat = data.getCurrentLat();
+        currentLon = data.getCurrentLong();
         if (actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
         }

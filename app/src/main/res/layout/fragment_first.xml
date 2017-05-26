@@ -24,6 +24,9 @@
             app:floatingSearch_menu="@menu/menu_search_view"
             app:floatingSearch_searchHint="Search..."
             app:floatingSearch_showSearchKey="true"
+            app:floatingSearch_searchBarMarginLeft="5dp"
+            app:floatingSearch_searchBarMarginRight="5dp"
+            app:floatingSearch_searchBarMarginTop="5dp"
             app:floatingSearch_suggestionsListAnimDuration="250"
             android:fitsSystemWindows="true"/>
     </FrameLayout>
