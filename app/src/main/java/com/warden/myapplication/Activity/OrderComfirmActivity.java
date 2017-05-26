@@ -1,5 +1,6 @@
 package com.warden.myapplication.Activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 
 import com.baidu.mapapi.map.MyLocationData;
 import com.warden.myapplication.R;
@@ -40,6 +42,7 @@ public class OrderComfirmActivity extends AppCompatActivity implements DatePicke
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comfirm_order);
+        initView();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -72,6 +75,25 @@ public class OrderComfirmActivity extends AppCompatActivity implements DatePicke
         dpd.setDisabledDays(getSelectableDays());
         dpd.show(getFragmentManager(), "Datepickerdialog");
         dpd.setSelectableDays(getSelectableDays());
+    }
+    private void initView(){
+        Button buttonCancel = (Button) findViewById(R.id.cancel_button) ;
+        buttonCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        Button buttonComfirm = (Button)findViewById(R.id.comfirm_button);
+        buttonComfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context context = OrderComfirmActivity.this;
+                Intent intent = new Intent(getApplicationContext(),OrderActivity.class);
+                context.startActivity(intent);
+            }
+        });
+
     }
 
     @Override

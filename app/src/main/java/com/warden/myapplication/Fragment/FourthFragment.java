@@ -14,8 +14,14 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.leon.lib.settingview.LSettingItem;
+import com.warden.myapplication.Activity.AboutActivity;
+import com.warden.myapplication.Activity.ColloctionActivity;
+import com.warden.myapplication.Activity.ElectricTicketActivity;
+import com.warden.myapplication.Activity.FeedBackActivity;
 import com.warden.myapplication.Activity.ListActivity;
 import com.warden.myapplication.Activity.LoginActivity;
+import com.warden.myapplication.Activity.OrderActivity;
+import com.warden.myapplication.Activity.PanssegerInformationActivity;
 import com.warden.myapplication.Activity.SettingsActivity;
 import com.warden.myapplication.R;
 
@@ -39,6 +45,7 @@ public class FourthFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    private Context context;
 
     public FourthFragment() {
         // Required empty public constructor
@@ -74,41 +81,91 @@ public class FourthFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        context = getContext();
         View view = inflater.inflate(R.layout.fragment_fourt, container, false);
         initView(view);
         return view;
     }
-    private void initView(View view){
+    private void initView(final View view){
         ImageView avaterBackground = (ImageView) view.findViewById(R.id.avatar_background) ;
         Glide.with(getContext()).load(R.drawable.user_background).centerCrop().into(avaterBackground);
         Button buttonLogin=(Button) view.findViewById(R.id.login);
-        LSettingItem lSettingItemOne = (LSettingItem) view.findViewById(R.id.item_message);
-        LSettingItem lSettingItemTow = (LSettingItem) view.findViewById(R.id.item_about);
-        LSettingItem lSettingItemEight = (LSettingItem)view.findViewById(R.id.item_setting);
-        lSettingItemEight.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
+        LSettingItem lSettingItemMeassage = (LSettingItem) view.findViewById(R.id.item_message);
+        LSettingItem lSettingItemAbout = (LSettingItem) view.findViewById(R.id.item_about);
+        LSettingItem lSettingItemSetting = (LSettingItem)view.findViewById(R.id.item_setting);
+        LSettingItem lSettingItemHistoryUserInfor = (LSettingItem)view.findViewById(R.id.item_history_user_information);
+        LSettingItem lSettingItemTicket = (LSettingItem) view.findViewById(R.id.item_ticket);
+        LSettingItem lSettingItemColloction = (LSettingItem)view.findViewById(R.id.item_collocation);
+        LSettingItem lSettingItemOrder = (LSettingItem)view.findViewById(R.id.item_order);
+        LSettingItem lSettingItemfeedback=(LSettingItem)view.findViewById(R.id.item_feedback);
+        lSettingItemSetting.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
             @Override
             public void click() {
-                Context context = getContext();
+                context = getContext();
                 Intent intent = new Intent(context, SettingsActivity.class);
                 context.startActivity(intent);
             }
         });
-        lSettingItemOne.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
+        lSettingItemMeassage.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
             @Override
             public void click() {
-                Context context = getContext();
                 Intent intent = new Intent(context, ListActivity.class);
                 context.startActivity(intent);
                 Toast.makeText(getContext().getApplicationContext(), "我的消息", Toast.LENGTH_SHORT).show();
             }
         });
 
-        lSettingItemTow.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
+        lSettingItemOrder.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
             @Override
             public void click() {
+                Intent intent = new Intent(context, OrderActivity.class);
+                context.startActivity(intent);
+            }
+        });
+        lSettingItemColloction.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
+            @Override
+            public void click() {
+                Intent intent = new Intent(context, PanssegerInformationActivity.class);
+                context.startActivity(intent);
 
             }
         });
+        lSettingItemTicket.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
+            @Override
+            public void click() {
+                Intent intent = new Intent(context, ElectricTicketActivity.class);
+                context.startActivity(intent);
+            }
+        });
+        lSettingItemColloction.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
+            @Override
+            public void click() {
+                Intent intent = new Intent(context, ColloctionActivity.class);
+                context.startActivity(intent);
+            }
+        });
+        lSettingItemfeedback.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
+            @Override
+            public void click() {
+                Intent intent = new Intent(context, FeedBackActivity.class);
+                context.startActivity(intent);
+            }
+        });
+        lSettingItemAbout.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
+            @Override
+            public void click() {
+                Intent intent = new Intent(context, AboutActivity.class);
+                context.startActivity(intent);
+            }
+        });
+        lSettingItemHistoryUserInfor.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
+            @Override
+            public void click() {
+                Intent intent =new Intent(context,PanssegerInformationActivity.class);
+                context.startActivity(intent);
+            }
+        });
+
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -117,6 +174,7 @@ public class FourthFragment extends Fragment {
                 context.startActivity(intent);
             }
         });
+
     }
 
 

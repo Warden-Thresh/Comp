@@ -129,16 +129,15 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
-    <string name="title_activity_order">orderActivity</string>
-
+    <string name="title_activity_order">订单</string>
     <string name="action_voice_rec">action voice rec</string>
     <string name="action_location">action location</string>
     <string name="action_taxi">action taxi</string>
     <string name="action_change_colors">change style</string>
     <string name="title_activity_main2">Main2Activity</string>
-    <string name="title_activity_pansseger">PanssegerActivity</string>
-    <string name="title_activity_electric_ticket">ElectricTicketActivity</string>
-    <string name="title_activity_colloction">ColloctionActivity</string>
-
-
+    <string name="title_activity_pansseger">常用联系人</string>
+    <string name="title_activity_electric_ticket">电子车票</string>
+    <string name="title_activity_colloction">收藏</string>
+    <string name="title_activity_feed_back">反馈</string>
+    <string name="title_activity_about">关于</string>
 </resources>

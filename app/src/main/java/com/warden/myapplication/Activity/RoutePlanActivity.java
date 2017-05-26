@@ -138,12 +138,15 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
     boolean hasShownDialogue = false;
     //dialog
     DialogPlus dialog;
+    Context context;
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_route_plan);
         Intent intent = getIntent();
+        context = RoutePlanActivity.this;
         aimLat = intent.getDoubleExtra("aimLat",0.0);
         aimLon =intent.getDoubleExtra("aimLon",0.0);
         aimName = intent.getStringExtra("aimName");
@@ -194,23 +197,18 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
                 .setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(DialogPlus dialog, View view) {
-                        Toast.makeText(RoutePlanActivity.this,"clickDialog",Toast.LENGTH_SHORT).show();
                         switch (view.getId()) {
                             case R.id.header_container:
                                 break;
                             case R.id.footer_confirm_button:
-                                Context context = RoutePlanActivity.this;
-                                Intent intent = new Intent(context, OrderComfirmActivity.class);
+                                intent = new Intent(context, OrderComfirmActivity.class);
                                 intent.putExtra("aimLat",aimLat);
                                 intent.putExtra("aimLon",aimLon);
                                 intent.putExtra("aimName",aimName);
                                 context.startActivity(intent);
                                 break;
-                            case R.id.go_to_button:
-
-                                break;
                             case R.id.footer_close_button:
-
+                                dialog.dismiss();
                                 break;
                         }
                     }
