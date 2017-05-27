@@ -55,10 +55,11 @@
                         android:textSize="19sp" />
                 </LinearLayout>
 
-                <com.baidu.mapapi.map.TextureMapView
+                <ImageView
                     android:id="@+id/order_preview_map"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"></com.baidu.mapapi.map.TextureMapView>
+                    android:layout_height="300dp"
+                    android:src="@drawable/designlinemap"></ImageView>
 
                 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="match_parent"

@@ -49,7 +49,7 @@ public class GuideActivity extends Activity {
         // 设置数据源
         mBackgroundBanner.setData(R.drawable.guide_background_2, R.drawable.guide_background_3, R.drawable.guide_background_4);
 
-        mForegroundBanner.setData(R.drawable.uoko_guide_foreground_1, R.drawable.uoko_guide_foreground_2, R.drawable.uoko_guide_foreground_3);
+       mForegroundBanner.setData(R.drawable.guid, R.drawable.guid, R.drawable.guid);
     }
 
     @Override

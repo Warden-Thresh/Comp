@@ -90,6 +90,9 @@ public class OrderComfirmActivity extends AppCompatActivity implements DatePicke
             public void onClick(View v) {
                 Context context = OrderComfirmActivity.this;
                 Intent intent = new Intent(getApplicationContext(),OrderActivity.class);
+                intent.putExtra("aimLat",aimLat);
+                intent.putExtra("aimLon",aimLon);
+                intent.putExtra("aimName",aimName);
                 context.startActivity(intent);
             }
         });

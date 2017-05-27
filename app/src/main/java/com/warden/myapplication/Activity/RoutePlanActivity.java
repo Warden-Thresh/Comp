@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -71,6 +72,7 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
     private static final String TAG = RoutePlanActivity.class.getName();
     String [] tabs={"驾车","公交","步行","骑行"};
     FloatingActionButton fbDesign;
+    AlertDialog alertDialog;
 
     EditText mEditStart;
 
@@ -188,6 +190,28 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         mTabLayout.setScrollPosition(1,0,true);
     }
     private void initDialog(){
+        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case -1:
+                        designLine();
+                        Log.d("Dialog",""+which);
+                        break;
+                    case -2:
+                        Log.d("Dialog",""+which);
+                        break;
+                    default:
+                        Log.d("Dialog",""+which);
+                }
+            }
+        };
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setPositiveButton("需要", listener);
+        alertDialogBuilder.setNegativeButton("不需要",listener);
+        alertDialogBuilder.setTitle("e公交");
+        alertDialogBuilder.setMessage("该线路绕行太远，是否需要定制公交");
+        alertDialog = alertDialogBuilder.create();
         SimpleAdapter adapter = new SimpleAdapter(RoutePlanActivity.this,false);
         dialog = DialogPlus.newDialog(RoutePlanActivity.this)
                 .setAdapter(adapter)
@@ -206,6 +230,7 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
                                 intent.putExtra("aimLon",aimLon);
                                 intent.putExtra("aimName",aimName);
                                 context.startActivity(intent);
+                                finish();
                                 break;
                             case R.id.footer_close_button:
                                 dialog.dismiss();
@@ -238,20 +263,7 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         fbDesign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.show();
-                orderMapView = (TextureMapView) dialog.getHolderView().findViewById(R.id.order_preview_map);
-                orderMapView.onResume();
-                mOrderBaiduMap = orderMapView.getMap();
-                mOrderBaiduMap.setMyLocationEnabled(true);
-                routeReview = null;
-                mOrderBaiduMap.clear();
-                // 处理搜索按钮响应
-                // 设置起终点信息，对于tranist search 来说，城市名无意义
-                PlanNode stNode = PlanNode.withLocation(new LatLng(currentLat,currentLon));
-                Log.d("current","currentLat:"+currentLat+"currentLon"+currentLon);
-                PlanNode enNode = PlanNode.withLocation(new LatLng(aimLat,aimLon));
-                mSearch.drivingSearch((new DrivingRoutePlanOption())
-                        .from(stNode).to(enNode));
+                designLine();
             }
         });
         mImgBack.setOnClickListener(new View.OnClickListener() {
@@ -260,6 +272,23 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
                 finish();
             }
         });
+    }
+    private void designLine(){
+        dialog.show();
+        orderMapView = (TextureMapView) dialog.getHolderView().findViewById(R.id.order_preview_map);
+        orderMapView.onResume();
+        mOrderBaiduMap = orderMapView.getMap();
+        mOrderBaiduMap.setMyLocationEnabled(true);
+        routeReview = null;
+        mOrderBaiduMap.clear();
+        // 处理搜索按钮响应
+        // 设置起终点信息，对于tranist search 来说，城市名无意义
+        PlanNode stNode = PlanNode.withLocation(new LatLng(currentLat,currentLon));
+        Log.d("current","currentLat:"+currentLat+"currentLon"+currentLon);
+        PlanNode enNode = PlanNode.withLocation(new LatLng(aimLat,aimLon));
+        mSearch.drivingSearch((new DrivingRoutePlanOption())
+                .from(stNode).to(enNode));
+
     }
     /**
      * 发起路线规划搜索示例
@@ -397,6 +426,7 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
 
         if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
             Toast.makeText(this, "抱歉，未找到结果", Toast.LENGTH_SHORT).show();
+            alertDialog.show();
         }
         if (result.error == SearchResult.ERRORNO.AMBIGUOUS_ROURE_ADDR) {
             // 起终点或途经点地址有岐义，通过以下接口获取建议查询信息
@@ -427,6 +457,24 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
                             overlay.setData(nowResultransit.getRouteLines().get(position));
                             overlay.addToMap();
                             overlay.zoomToSpan();
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try{
+                                        Thread.sleep(2000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+
+                                            alertDialog.show();
+                                        }
+                                    });
+                                }
+                            }).start();
+
                         }
 
                     });
