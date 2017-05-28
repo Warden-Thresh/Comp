@@ -53,7 +53,7 @@ public class OrderActivity extends AppCompatActivity {
             public void run() {
                 try {
 
-                    Thread.sleep(3000);
+                    Thread.sleep(6000);
                     Log.d("DDD","");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -61,14 +61,14 @@ public class OrderActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        button.setText("订单已生效");
+                        button.setText("查看车票");
                         button.setClickable(true);
                         Intent intent = new Intent(OrderActivity.this, OrderActivity.class);
                         PendingIntent pi = PendingIntent.getActivity(OrderActivity.this, 0, intent, 0);
                         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                         Notification notification = new NotificationCompat.Builder(OrderActivity.this)
                                 .setContentTitle("e公交")
-                                .setContentText("你的预定已生效，请按时乘车,点击查看详情")
+                                .setContentText("已接受你的预定，请按时乘车,点击查看详情")
                                 .setWhen(System.currentTimeMillis())
                                 .setSmallIcon(R.mipmap.ic_launcher)
                                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
@@ -87,16 +87,6 @@ public class OrderActivity extends AppCompatActivity {
                 });
             }
         }).start();
-
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
     }
 
 }

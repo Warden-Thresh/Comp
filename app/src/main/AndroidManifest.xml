@@ -78,7 +78,7 @@
             android:label="@string/title_activity_settings" />
         <activity
             android:name=".Activity.OrderComfirmActivity"
-            android:label="@string/title_activity_order"
+            android:label="预定"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".Activity.Main2Activity"

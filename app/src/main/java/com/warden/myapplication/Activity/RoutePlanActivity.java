@@ -108,7 +108,8 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
     private double currentLat;
     private double currentLon;
     // 浏览路线节点相关
-    Button mBtnPre = null; // 上一个节点
+    Button mBtnPre = null; //
+
     Button mBtnNext = null; // 下一个节点
     int nodeIndex = -1; // 节点索引,供浏览节点时使用
     RouteLine route = null;
@@ -225,6 +226,7 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
                             case R.id.header_container:
                                 break;
                             case R.id.footer_confirm_button:
+                                Log.d("确认地点","confirm");
                                 intent = new Intent(context, OrderComfirmActivity.class);
                                 intent.putExtra("aimLat",aimLat);
                                 intent.putExtra("aimLon",aimLon);
@@ -461,7 +463,7 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
                                 @Override
                                 public void run() {
                                     try{
-                                        Thread.sleep(2000);
+                                        Thread.sleep(5000);
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
