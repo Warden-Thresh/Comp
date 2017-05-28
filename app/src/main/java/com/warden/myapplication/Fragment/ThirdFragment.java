@@ -293,7 +293,7 @@ public class ThirdFragment extends Fragment {
             TextView maxText = (TextView) view.findViewById(R.id.max_text);
             TextView minText = (TextView) view.findViewById(R.id.min_text);
             dateText.setText(forecast.getDate());
-            infoText.setText(forecast.getCond().getCode_d());
+            infoText.setText(forecast.getCond().getTxt_d());
             maxText.setText(forecast.getTmp().getMax());
             minText.setText(forecast.getTmp().getMin());
             forecastLayout.addView(view);
