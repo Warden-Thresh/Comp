@@ -423,7 +423,7 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
 
     @Override
     public void onMapLoaded() {
-        navigateTo(mBdlocation);
+       // navigateTo(mBdlocation);
         Log.d("MapLoaded","");
 
     }
@@ -435,20 +435,21 @@ public class FirstFragment extends Fragment implements SensorEventListener,OnGet
             if (location == null || mMapView == null) {
                 return;
             }
-            mCurrentLat = location.getLatitude();
-            mCurrentLon = location.getLongitude();
-            mCurrentAccracy = location.getRadius();
-            final Data data = (Data) getActivity().getApplication();
-            data.setCurrentLat(mCurrentLat);
-            data.setCurrentLong(mCurrentLon);
-            locData = new MyLocationData.Builder()
-                    .accuracy(location.getRadius())
-                    // 此处设置开发者获取到的方向信息，顺时针0-360
-                    .direction(mCurrentDirection).latitude(location.getLatitude())
-                    .longitude(location.getLongitude()).build();
-            mBaiduMap.setMyLocationData(locData);
             if(location.getLocType() == BDLocation.TypeNetWorkLocation||location.getLocType()== BDLocation.TypeGpsLocation||location.getLocType()==BDLocation.TypeOffLineLocation){
+                mCurrentLat = location.getLatitude();
+                mCurrentLon = location.getLongitude();
+                mCurrentAccracy = location.getRadius();
+                final Data data = (Data) getActivity().getApplication();
+                data.setCurrentLat(mCurrentLat);
+                data.setCurrentLong(mCurrentLon);
+                locData = new MyLocationData.Builder()
+                        .accuracy(location.getRadius())
+                        // 此处设置开发者获取到的方向信息，顺时针0-360
+                        .direction(mCurrentDirection).latitude(location.getLatitude())
+                        .longitude(location.getLongitude()).build();
+                mBaiduMap.setMyLocationData(locData);
                 if (isFirstLocate) {
+                    navigateTo(mBdlocation);
                     isFirstLocate = false;
                 }
             }
