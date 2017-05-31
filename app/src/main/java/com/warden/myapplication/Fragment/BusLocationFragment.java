@@ -372,7 +372,7 @@ public class BusLocationFragment extends Fragment implements
                 .fromResource(R.drawable.marker)).position(busLinePoints.get(0)).rotate((float) getAngle(0));
         mMoveMarker =(Marker) mBaiduMap.addOverlay(markerOptions);
         if (mParam1.equals("我的订单")){
-           // moveLooper();
+           moveLooper();
         }
     }
 
@@ -503,8 +503,9 @@ public class BusLocationFragment extends Fragment implements
             public void run() {
 
                 while (true) {
+                    int start = busLinePoints.size()*5/10;
 
-                    for (int i = 0; i < busLinePoints.size() - 1; i++) {
+                    for (int i =start; i < busLinePoints.size() - 1; i++) {
                         Log.d("Point"+busLinePoints.size(),i+":"+busLinePoints.get(i).toString());
                         final LatLng startPoint = busLinePoints.get(i);
                         final LatLng endPoint = busLinePoints.get(i+1);

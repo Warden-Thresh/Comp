@@ -29,15 +29,20 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="ElK18R8cOCmuZl0z0AvHFPeeTm4Ux8m6" />
+            android:value="ElK18R8cOCmuZl0z0AvHFPeeTm4Ux8m6"
+           />
 
-        <activity android:name=".Activity.MainActivity">
+        <activity android:name=".Activity.GuideActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".Activity.MainActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".Activity.DetailActivity"
             android:theme="@style/DetailActivityTheme" />
@@ -73,7 +78,7 @@
             android:label="@string/title_activity_settings" />
         <activity
             android:name=".Activity.OrderComfirmActivity"
-            android:label="@string/title_activity_order"
+            android:label="预定"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".Activity.Main2Activity"

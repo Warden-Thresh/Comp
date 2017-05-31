@@ -9,7 +9,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:id="@+id/search_layout">
+        android:id="@+id/search_layout"
+        android:background="#00000000">
 
         <TextView
             android:layout_width="wrap_content"

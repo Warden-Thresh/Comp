@@ -1,6 +1,9 @@
 package com.warden.myapplication.Activity;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,12 +14,19 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 import com.baidu.mapapi.map.MyLocationData;
+import com.orhanobut.dialogplus.DialogPlus;
+import com.orhanobut.dialogplus.OnClickListener;
+import com.orhanobut.dialogplus.OnItemClickListener;
+import com.orhanobut.dialogplus.ViewHolder;
 import com.warden.myapplication.R;
+import com.warden.myapplication.adapter.SimpleAdapter;
 import com.warden.myapplication.util.Data;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -28,6 +38,10 @@ public class OrderComfirmActivity extends AppCompatActivity implements DatePicke
     public double aimLat;
     public double aimLon;
     public String aimName;
+    //dialog
+    DialogPlus dialog;
+    Context context;
+    Intent intent;
     //当前位置
     private MyLocationData locData;
     private double currentLat;
@@ -36,6 +50,8 @@ public class OrderComfirmActivity extends AppCompatActivity implements DatePicke
     private String startLocationName;
     private String date;
     private String previewImageUrl;
+    private ProgressBar progressBar;
+    ProgressDialog progressDialog;
     private Calendar[] selectableCalenders=new Calendar[7];
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -43,6 +59,7 @@ public class OrderComfirmActivity extends AppCompatActivity implements DatePicke
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comfirm_order);
         initView();
+        initDialog();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -56,14 +73,6 @@ public class OrderComfirmActivity extends AppCompatActivity implements DatePicke
         if (actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
         Calendar now = Calendar.getInstance();
         DatePickerDialog dpd = DatePickerDialog.newInstance(
                 OrderComfirmActivity.this,
@@ -88,12 +97,71 @@ public class OrderComfirmActivity extends AppCompatActivity implements DatePicke
         buttonComfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Context context = OrderComfirmActivity.this;
+                dialog.show();
+                /*Context context = OrderComfirmActivity.this;
                 Intent intent = new Intent(getApplicationContext(),OrderActivity.class);
+                intent.putExtra("aimLat",aimLat);
+                intent.putExtra("aimLon",aimLon);
+                intent.putExtra("aimName",aimName);
                 context.startActivity(intent);
+                */
             }
         });
 
+    }
+    private void initDialog(){
+        SimpleAdapter adapter = new SimpleAdapter(OrderComfirmActivity.this,false);
+        dialog = DialogPlus.newDialog(OrderComfirmActivity.this)
+                .setAdapter(adapter)
+                .setExpanded(false)
+                .setContentHolder(new ViewHolder(R.layout.alipay_content))
+                .setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(DialogPlus dialog, View view) {
+                        switch (view.getId()) {
+                            case R.id.header_container:
+                                break;
+                            case R.id.paycomfirm:
+                                progressDialog = new ProgressDialog(OrderComfirmActivity.this);
+                                progressDialog.setTitle("请稍后");
+                                progressDialog.setMessage("正在支付....");
+                                progressDialog.setCancelable(true);
+                                progressDialog.show();
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try{
+                                            Thread.sleep(2000);
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                progressDialog.dismiss();
+                                                Context context = OrderComfirmActivity.this;
+                                                Intent intent = new Intent(getApplicationContext(),OrderActivity.class);
+                                                intent.putExtra("aimLat",aimLat);
+                                                intent.putExtra("aimLon",aimLon);
+                                                intent.putExtra("aimName",aimName);
+                                                context.startActivity(intent);
+                                            }
+                                        });
+                                    }
+                                }).start();
+                                break;
+                            case R.id.footer_close_button:
+                                dialog.dismiss();
+                                break;
+                        }
+                    }
+                })
+                .setOnItemClickListener(new OnItemClickListener() {
+                    @Override
+                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                    }
+                })
+                .create();
     }
 
     @Override
