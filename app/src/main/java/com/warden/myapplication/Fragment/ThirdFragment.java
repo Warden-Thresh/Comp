@@ -221,7 +221,7 @@ public class ThirdFragment extends Fragment {
         currentLat = data.getCurrentLat();
         currentLon = data.getCurrentLong();
         String weatherId = currentLon + ","+currentLat;
-        String weatherUrl = "https://api.heweather.com/v5/weather?city=" + weatherId + "&key=0d4a4167be61427cab63223e1c184d21";
+        String weatherUrl = "https://free-api.heweather.com/v5/weather?city=" + weatherId + "&key=0d4a4167be61427cab63223e1c184d21";
         Log.d("URL:",weatherUrl);
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
